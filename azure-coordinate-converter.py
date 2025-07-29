@@ -22,7 +22,7 @@ class CoordinateConverter:
         self.mgrs_converter = mgrs.MGRS()
 
     def lat_lon_to_utm(self, lat: float, lon: float) -> Tuple[int, float, float, str]:
-        """경위도(Lat/Lon)를 UTM으로 변환"""
+        """경위도(Latitude/Longitude)를 UTM으로 변환"""
         try:
             easting, northing, zone_number, zone_letter = utm.from_latlon(lat, lon)
             return zone_number, easting, northing, zone_letter
@@ -30,16 +30,16 @@ class CoordinateConverter:
             raise ValueError(f"UTM conversion error: {str(e)}")
 
     def utm_to_lat_lon(self, zone_number: int, zone_letter: str, easting: float, northing: float) -> Tuple[float, float]:
-        """UTM을 경위도(Lat/Lon)로 변환"""
+        """UTM을 경위도(Latitude/Longitude)로 변환"""
         try:
             is_northern = zone_letter.upper() >= 'N'
             lat, lon = utm.to_latlon(easting, northing, zone_number, northern=is_northern)
             return lat, lon
         except Exception as e:
-            raise ValueError(f"Lat/Lon conversion error: {str(e)}")
+            raise ValueError(f"Latitude/Longitude conversion error: {str(e)}")
 
     def lat_lon_to_mgrs(self, lat: float, lon: float) -> str:
-        """경위도(Lat/Lon)를 MGRS로 변환"""
+        """경위도(Latitude/Longitude)를 MGRS로 변환"""
         try:
             mgrs_coord = self.mgrs_converter.toMGRS(lat, lon, MGRSPrecision=5)
             return mgrs_coord.decode('utf-8') if isinstance(mgrs_coord, bytes) else mgrs_coord
@@ -47,12 +47,12 @@ class CoordinateConverter:
             raise ValueError(f"MGRS conversion error: {str(e)}")
 
     def mgrs_to_lat_lon(self, mgrs_coord: str) -> Tuple[float, float]:
-        """MGRS를 경위도(Lat/Lon)로 변환"""
+        """MGRS를 경위도(Latitude/Longitude)로 변환"""
         try:
             lat, lon = self.mgrs_converter.toLatLon(mgrs_coord)
             return lat, lon
         except Exception as e:
-            raise ValueError(f"Lat/Lon conversion error: {str(e)}")
+            raise ValueError(f"Latitude/Longitude conversion error: {str(e)}")
 
     def validate_lat_lon(self, lat: float, lon: float) -> bool:
         """경위도 유효성 검사"""
@@ -136,7 +136,7 @@ def main():
 
         try:
             if coord_type == "Latitude/Longitude":
-                st.subheader("Enter Lat/Lon Coordinates")
+                st.subheader("Enter Latitude/Longitude Coordinates")
                 # ✨ FIX: step과 format 인자를 명시적으로 지정
                 lat_in = st.number_input("Latitude", min_value=-90.0, max_value=90.0, value=st.session_state.lat, step=0.000001, format="%.6f")
                 lon_in = st.number_input("Longitude", min_value=-180.0, max_value=180.0, value=st.session_state.lon, step=0.000001, format="%.6f")
@@ -174,7 +174,7 @@ def main():
 
                 st.write("---")
                 st.header("Conversion Results")
-                st.subheader("📍 Latitude/Longitude (Lat/Lon)")
+                st.subheader("📍 Latitude/Longitude")
                 st.write(f"**Latitude:** `{lat:.6f}°`")
                 st.write(f"**Longitude:** `{lon:.6f}°`")
                 st.subheader("🗺️ UTM")
