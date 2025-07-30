@@ -9,9 +9,19 @@ st.write("아이디어를 현실로 만들 준비가 되셨나요? 저희에게 
 # Formsubmit.co를 이용한 문의 폼
 contact_form = """
 <style>
-/* --- 문의하기 폼 스타일링 --- */
-input[type=text], input[type=email], textarea {
+input[type=text], input[type=email] {
   width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+textarea {
+  width: 100%;
+  height: 200px;
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 4px;

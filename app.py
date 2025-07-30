@@ -11,12 +11,12 @@ st.set_page_config(
 pg = st.navigation(
     {
         "Home": [
-            st.Page("home/intro.py", title="Home", icon="🏠"),
-            st.Page("home/contact.py", title="Contact", icon="📧")
+            st.Page("pages/home/intro.py", title="Home", icon="🏠"),
+            st.Page("pages/home/contact.py", title="Contact", icon="📧")
         ],
         "Developer":[
-            st.Page("float-bits.py", title="IEEE 754 Floating Point Bit Representation Analyzer", icon="🔢"),
-            st.Page("coordinate-converter.py", title="Geographic Coordinate Converter", icon="🗺️")
+            st.Page("pages/developers/float-bits.py", title="IEEE 754 Floating Point Bit Representation Analyzer", icon="🔢"),
+            st.Page("pages/developers/coordinate-converter.py", title="Geographic Coordinate Converter", icon="🗺️")
         ]
     }
 )
