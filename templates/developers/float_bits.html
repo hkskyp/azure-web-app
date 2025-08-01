@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+
+{% block title %}[lucasoft] | IEEE 754 Floating Point Analyzer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">🔢 IEEE 754 Floating Point Bit Representation Analyzer</h1>
+    <p class="page-description">Analyze the IEEE 754 standard bit representation of floating-point numbers and visualize the formula calculation process.</p>
+</div>
+
+<hr class="divider">
+
+<div class="tool-container">
+    <div class="tool-section">
+        <h2 class="section-header">Floating-Point Input</h2>
+        <div class="input-group">
+            <label for="floatInput">Input Number:</label>
+            <input type="number" id="floatInput" step="any" placeholder="e.g., 3.14159" class="number-input">
+            <button id="analyzeBtn" class="analyze-btn">Analyze</button>
+            <button id="piBtn" class="analyze-btn">π</button>
+            <button id="expBtn" class="analyze-btn">e</button>
+        </div>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+        <h2 class="section-header">Analysis Results</h2>
+        
+        <!-- 32비트 Float 분석 -->
+        <div class="float-analysis">
+            <h3>32-bit Float (Single Precision)</h3>
+            <div class="bit-representation">
+                <div class="bit-section sign">
+                    <label>Sign (1 bit)</label>
+                    <div class="bits" id="sign32"></div>
+                </div>
+                <div class="bit-section exponent">
+                    <label>Exponent (8 bits)</label>
+                    <div class="bits" id="exponent32"></div>
+                </div>
+                <div class="bit-section mantissa">
+                    <label>Mantissa (23 bits)</label>
+                    <div class="bits" id="mantissa32"></div>
+                </div>
+            </div>
+            <div class="analysis-details">
+                <p><strong>Binary:</strong> <span id="binary32"></span></p>
+                <p><strong>Hexadecimal:</strong> <span id="hex32"></span></p>
+                <p><strong>Decimal Value:</strong> <span id="decimal32"></span></p>
+            </div>
+            
+            <div class="ieee-formula" id="formula32">
+                <div class="formula-title">IEEE 754 Formula Analysis (32-bit)</div>
+                <div class="formula-breakdown" id="breakdown32"></div>
+                <div class="formula-calculation" id="calculation32"></div>
+                <div class="formula-result" id="result32"></div>
+            </div>
+        </div>
+
+        <!-- 64비트 Double 분석 -->
+        <div class="float-analysis">
+            <h3>64-bit Double (Double Precision)</h3>
+            <div class="bit-representation">
+                <div class="bit-section sign">
+                    <label>Sign (1 bit)</label>
+                    <div class="bits" id="sign64"></div>
+                </div>
+                <div class="bit-section exponent">
+                    <label>Exponent (11 bits)</label>
+                    <div class="bits" id="exponent64"></div>
+                </div>
+                <div class="bit-section mantissa">
+                    <label>Mantissa (52 bits)</label>
+                    <div class="bits" id="mantissa64"></div>
+                </div>
+            </div>
+            <div class="analysis-details">
+                <p><strong>Binary:</strong> <span id="binary64"></span></p>
+                <p><strong>Hexadecimal:</strong> <span id="hex64"></span></p>
+                <p><strong>Decimal Value:</strong> <span id="decimal64"></span></p>
+            </div>
+            
+            <div class="ieee-formula" id="formula64">
+                <div class="formula-title">IEEE 754 Formula Analysis (64-bit)</div>
+                <div class="formula-breakdown" id="breakdown64"></div>
+                <div class="formula-calculation" id="calculation64"></div>
+                <div class="formula-result" id="result64"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사용법 설명 -->
+    <div class="help-section">
+        <h2 class="section-header">How to Use</h2>
+        <ul class="help-list">
+            <li>Enter a number and click the "Analyze" button.</li>
+            <li>You can check the 32-bit and 64-bit representations according to the IEEE 754 standard.</li>
+            <li>You can visually inspect the bit composition of the Sign, Exponent, and Mantissa parts.</li>
+            <li>Special values (NaN, Infinity, 0, denormalized, etc.) can also be analyzed.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.tool-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.input-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.number-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.analyze-btn {
+    background-color: #ff4b4b;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.analyze-btn:hover {
+    background-color: #e03e3e;
+}
+
+.float-analysis {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.bit-representation {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.bit-section {
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+
+.bit-section label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.bits {
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    letter-spacing: 1px;
+}
+
+.sign { background-color: #ffe6e6; }
+.exponent { background-color: #e6f3ff; }
+.mantissa { background-color: #e6ffe6; }
+
+.analysis-details {
+    font-family: 'Courier New', monospace;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ddd;
+}
+
+.ieee-formula {
+    background: #fff9e6;
+    border: 1px solid #ffd700;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.formula-title {
+    font-weight: 600;
+    color: #b8860b;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.formula-breakdown {
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+.formula-breakdown p {
+    margin: 0.5rem 0;
+}
+
+.formula-result {
+    background: #e8f5e8;
+    border: 1px solid #4caf50;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.formula-calculation {
+    background: #f0f8ff;
+    border: 1px solid #4169e1;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    line-height: 2;
+}
+
+.special-case {
+    background: #ffebee;
+    border: 1px solid #f44336;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+.help-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.help-list li {
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.help-list li::before {
+    content: "•";
+    color: #ff4b4b;
+    position: absolute;
+    left: 0;
+}
+
+@media (max-width: 768px) {
+    .input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .bit-representation {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+</script>
+<script>
+MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: {
+        fontCache: 'global'
+    }
+};
+document.getElementById('analyzeBtn').addEventListener('click', function() {
+    const input = document.getElementById('floatInput').value;
+    if (input === '') {
+        alert('숫자를 입력해주세요.');
+        return;
+    }
+    
+    const num = parseFloat(input);
+    analyzeFloat(num);
+    document.getElementById('resultsSection').style.display = 'block';
+});
+
+// "pi" 버튼 클릭 이벤트
+piBtn.addEventListener('click', () => {
+    // floatInput의 값을 Math.PI (π)로 설정
+    floatInput.value = Math.PI;
+});
+
+// "exp" 버튼 클릭 이벤트
+expBtn.addEventListener('click', () => {
+    // floatInput의 값을 Math.E (자연로그의 밑)로 설정
+    floatInput.value = Math.E;
+});
+
+function analyzeFloat(num) {
+    // 32-bit float analysis
+    const float32 = new Float32Array([num]);
+    const int32 = new Uint32Array(float32.buffer);
+    const bits32 = int32[0].toString(2).padStart(32, '0');
+    
+    document.getElementById('sign32').textContent = bits32.substring(0, 1);
+    document.getElementById('exponent32').textContent = bits32.substring(1, 9);
+    document.getElementById('mantissa32').textContent = bits32.substring(9);
+    document.getElementById('binary32').textContent = bits32;
+    document.getElementById('hex32').textContent = '0x' + int32[0].toString(16).toUpperCase();
+    document.getElementById('decimal32').textContent = float32[0];
+    
+    // IEEE 754 formula analysis for 32-bit
+    analyzeIEEE754Formula(bits32, 32);
+    
+    // 64-bit double analysis
+    const float64 = new Float64Array([num]);
+    const int32_64 = new Uint32Array(float64.buffer);
+    const high = int32_64[1];
+    const low = int32_64[0];
+    const bits64 = (high.toString(2).padStart(32, '0') + low.toString(2).padStart(32, '0'));
+    
+    document.getElementById('sign64').textContent = bits64.substring(0, 1);
+    document.getElementById('exponent64').textContent = bits64.substring(1, 12);
+    document.getElementById('mantissa64').textContent = bits64.substring(12);
+    document.getElementById('binary64').textContent = bits64;
+    document.getElementById('hex64').textContent = '0x' + high.toString(16).toUpperCase() + low.toString(16).toUpperCase().padStart(8, '0');
+    document.getElementById('decimal64').textContent = float64[0];
+    
+    // IEEE 754 formula analysis for 64-bit
+    analyzeIEEE754Formula(bits64, 64);
+}
+
+async function analyzeIEEE754Formula(bits, precision) {
+    const suffix = precision.toString();
+    const signBit = parseInt(bits.substring(0, 1));
+    
+    let exponentBits, mantissaBits, bias, exponentLength, mantissaLength;
+    
+    if (precision === 32) {
+        exponentBits = bits.substring(1, 9);
+        mantissaBits = bits.substring(9);
+        bias = 127;
+        exponentLength = 8;
+        mantissaLength = 23;
+    } else {
+        exponentBits = bits.substring(1, 12);
+        mantissaBits = bits.substring(12);
+        bias = 1023;
+        exponentLength = 11;
+        mantissaLength = 52;
+    }
+
+    const exponentValue = parseInt(exponentBits, 2);
+    const mantissaValue = parseInt(mantissaBits, 2);
+    
+    let breakdown = '';
+    let calculation = '';
+    let result = '';
+    
+    // 특수 케이스 검사
+    if (exponentValue === Math.pow(2, exponentLength) - 1) {
+        // All exponent bits are 1
+        if (mantissaValue === 0) {
+            // Infinity
+            breakdown = `<p><strong>Special Value Detected:</strong> ${signBit === 0 ? '+' : '-'}Infinity</p>`;
+            breakdown += `<p>Exponent: All bits are 1 (${exponentBits})</p>`;
+            breakdown += `<p>Mantissa: All bits are 0 (${mantissaBits})</p>`;
+            
+            calculation = `<div class="formula-section">$$\\text{Result} = ${signBit === 0 ? '+' : '-'}\\infty$$</div>`;
+            
+            result = `<div class="special-case">Result: ${signBit === 0 ? '+' : '-'}∞</div>`;
+        } else {
+            // NaN
+            breakdown = `<p><strong>Special Value Detected:</strong> NaN (Not a Number)</p>`;
+            breakdown += `<p>Exponent: All bits are 1 (${exponentBits})</p>`;
+            breakdown += `<p>Mantissa: Not zero (${mantissaBits})</p>`;
+            
+            calculation = `<div class="formula-section">$$\\text{Result} = \\text{NaN}$$</div>`;
+            
+            result = `<div class="special-case">Result: NaN</div>`;
+        }
+    } else if (exponentValue === 0) {
+        if (mantissaValue === 0) {
+            // Zero
+            breakdown = `<p><strong>Special Value Detected:</strong> ${signBit === 0 ? '+' : '-'}0</p>`;
+            breakdown += `<p>Exponent: All bits are 0 (${exponentBits})</p>`;
+            breakdown += `<p>Mantissa: All bits are 0 (${mantissaBits})</p>`;
+            
+            calculation = `<div class="formula-section">$$\\text{결과} = ${signBit === 0 ? '+' : '-'}0$$</div>`;
+            
+            result = `<div class="special-case">결과: ${signBit === 0 ? '+' : '-'}0</div>`;
+        } else {
+            // Denormalized number
+            const actualExponent = 1 - bias;
+            const mantissaFraction = mantissaValue / Math.pow(2, mantissaLength);
+            const sign = Math.pow(-1, signBit);
+            const finalValue = sign * mantissaFraction * Math.pow(2, actualExponent);
+            
+            breakdown = `<p><strong>Denormalized Number:</strong></p>`;
+            breakdown += `<p>Sign: ${signBit} → ${signBit === 0 ? '+' : '-'}1</p>`;
+            breakdown += `<p>Exponent: ${exponentBits} (${exponentValue}) → Actual exponent: ${actualExponent}</p>`;
+            breakdown += `<p>Mantissa: ${mantissaBits} → ${mantissaValue} (no implicit 1)</p>`;
+            
+            calculation = `<div class="formula-section">
+                <p><strong>Denormalized Number Formula:</strong></p>
+                $$(-1)^{s} \\times \\frac{M}{2^{${mantissaLength}}} \\times 2^{1-${bias}}$$
+                
+                <p><strong>Value Substitution:</strong></p>
+                $$(-1)^{${signBit}} \\times \\frac{${mantissaValue}}{2^{${mantissaLength}}} \\times 2^{${actualExponent}}$$
+                
+                $$= ${sign} \\times ${mantissaFraction} \\times ${Math.pow(2, actualExponent)}$$
+                
+                $$= ${finalValue}$$
+            </div>`;
+            
+            result = `<strong>Final Result:</strong> ${finalValue}`;
+        }
+    } else {
+        // Normal number
+        const actualExponent = exponentValue - bias;
+        const mantissaFraction = mantissaValue / Math.pow(2, mantissaLength);
+        const sign = Math.pow(-1, signBit);
+        const finalValue = sign * (1 + mantissaFraction) * Math.pow(2, actualExponent);
+        
+        breakdown = `<p><strong>Normalized Number:</strong></p>`;
+        breakdown += `<p>Sign: ${signBit} → ${signBit === 0 ? '+' : '-'}1</p>`;
+        breakdown += `<p>Exponent: ${exponentBits} (${exponentValue}) → Actual exponent: ${exponentValue} - ${bias} = ${actualExponent}</p>`;
+        breakdown += `<p>Mantissa: ${mantissaBits} → ${mantissaValue} (with implicit 1)</p>`;
+        
+        calculation = `<div class="formula-section">
+            <p><strong>IEEE 754 Standard Formula:</strong></p>
+            $$(-1)^{s} \\times \\left(1 + \\frac{M}{2^{${mantissaLength}}}\\right) \\times 2^{E-${bias}}$$
+            
+            <p><strong>Value Substitution:</strong></p>
+            $$(-1)^{${signBit}} \\times \\left(1 + \\frac{${mantissaValue}}{2^{${mantissaLength}}}\\right) \\times 2^{${exponentValue}-${bias}}$$
+            
+            $$= ${sign} \\times \\left(1 + ${mantissaFraction}\\right) \\times 2^{${actualExponent}}$$
+            
+            $$= ${sign} \\times ${(1 + mantissaFraction)} \\times ${Math.pow(2, actualExponent)}$$
+            
+            $$= ${finalValue}$$
+        </div>`;
+        
+        result = `<strong>Final Result:</strong> ${finalValue}`;
+    }
+    
+    document.getElementById(`breakdown${suffix}`).innerHTML = breakdown;
+    document.getElementById(`calculation${suffix}`).innerHTML = calculation;
+    document.getElementById(`result${suffix}`).innerHTML = result;
+    
+    // MathJax 렌더링 (동적으로 추가된 수식들)
+    if (window.MathJax) {
+        await MathJax.typesetPromise([document.getElementById(`calculation${suffix}`)]);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}[lucasoft] | SW 개발 전문{% endblock %}</title>
+    <link rel="icon" href="🚀" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 사이드바 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/" style="text-decoration:none"><h2>🚀 LucaSoft</h2></a>
+            <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <!-- Home 섹션 -->
+            <div class="nav-section">
+                <h3 class="nav-section-title">Home</h3>
+                <ul class="nav-menu">
+                    <li>
+                        <a href="/home" class="nav-link {% if current_page == 'home' %}active{% endif %}">
+                            🏠 Home
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/contact" class="nav-link {% if current_page == 'contact' %}active{% endif %}">
+                            📧 Contact
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Developer 섹션 -->
+            <div class="nav-section">
+                <h3 class="nav-section-title">Developer</h3>
+                <ul class="nav-menu">
+                    <li>
+                        <a href="/developers/float-bits" class="nav-link {% if current_page == 'float-bits' %}active{% endif %}">
+                            🔢 IEEE 754 Analyzer
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/developers/coordinate-converter" class="nav-link {% if current_page == 'coordinate-converter' %}active{% endif %}">
+                            🗺️ Coordinate Converter
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="main-content" id="mainContent">
+        <!-- 데스크톱 헤더 (사이드바 축소 시) -->
+        <div class="desktop-header" id="desktopHeader" style="display: none;">
+            <button class="desktop-menu-btn" id="desktopMenuBtn">☰</button>
+            <h1>🚀 LucaSoft</h1>
+        </div>
+        
+        <!-- 모바일 헤더 -->
+        <div class="mobile-header">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <h1>LucaSoft</h1>
+        </div>
+
+        <!-- 페이지 콘텐츠 -->
+        <div class="content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- 사이드바 오버레이 (모바일용) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <script src="{{ url_for('static', path='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

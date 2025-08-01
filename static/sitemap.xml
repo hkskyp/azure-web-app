@@ -8,19 +8,25 @@
 
 <url>
    <loc>https://lucasoft.ai.kr/</loc>
-   <lastmod>2025-07-29T12:42:18+00:00</lastmod>
+   <lastmod>2025-08-01T12:42:18+00:00</lastmod>
    <changefreq>monthly</changefreq>
    <priority>1.0000</priority>
 </url>
 <url>
-   <loc>https://lucasoft.ai.kr/float-bits</loc>
-   <lastmod>2025-07-29T12:42:18+00:00</lastmod>
+   <loc>https://lucasoft.ai.kr/home</loc>
+   <lastmod>2025-08-01T12:42:18+00:00</lastmod>
    <changefreq>monthly</changefreq>
    <priority>1.0000</priority>
 </url>
 <url>
-   <loc>https://lucasoft.ai.kr/coordinate-converter</loc>
-   <lastmod>2025-07-29T12:42:18+00:00</lastmod>
+   <loc>https://lucasoft.ai.kr/developers/float-bits</loc>
+   <lastmod>2025-08-01T12:42:18+00:00</lastmod>
+   <changefreq>monthly</changefreq>
+   <priority>1.0000</priority>
+</url>
+<url>
+   <loc>https://lucasoft.ai.kr//developers/coordinate-converter</loc>
+   <lastmod>2025-08-01T12:42:18+00:00</lastmod>
    <changefreq>monthly</changefreq>
    <priority>1.0000</priority>
 </url>

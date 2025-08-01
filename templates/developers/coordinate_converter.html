@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}[lucasoft] | Geographic Coordinate Converter{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">🗺️ Geographic Coordinate Converter</h1>
+    <p class="page-description">다양한 지리 좌표계 간의 변환을 수행합니다.</p>
+</div>
+
+<hr class="divider">
+
+<div class="tool-container">
+    <!-- 좌표 입력 섹션 -->
+    <div class="coordinate-section">
+        <h2 class="section-header">좌표 변환</h2>
+        <div class="converter-grid">
+            <!-- 입력 좌표 -->
+            <div class="coordinate-fields">
+                <div class="form-group">
+                    <form action="/developers/coordinate-converter" method="post">
+                        <label>Latitude/Longitude</label>
+                        <input type="hidden" name="coord_type" value="latlon">
+                        <input type="number" step="0.000001" name="lat" placeholder="Latitude" class="coordinate-input-field" value="{{ result.lat if result and result.lat is defined else 37.5 }}" required>
+                        <input type="number" step="0.000001" name="lon" placeholder="Longitude" class="coordinate-input-field" value="{{ result.lon if result and result.lon is defined else 127.0 }}" required>
+                        <button type="submit" class="convert-btn">Convert</button>
+                    </form>
+                </div>
+                <div class="form-group">
+                    <form action="/developers/coordinate-converter" method="post">
+                        <label>UTM</label>
+                        <input type="hidden" name="coord_type" value="utm">
+                        <input type="number" name="zone_number" placeholder="Zone Number" class="coordinate-input-field" value="{{ result.utm[0] if result and result.utm[0] is defined }}" required>
+                        <input type="text" name="zone_letter" placeholder="Zone Letter" class="coordinate-input-field" value="{{ result.utm[3] if result and result.utm[3] is defined }}" required>
+                        <input type="number" name="easting" placeholder="Easting" class="coordinate-input-field" value="{{ result.utm[1] if result and result.utm[1] is defined }}" required>
+                        <input type="number" name="northing" placeholder="Northing" class="coordinate-input-field" value="{{ result.utm[2] if result and result.utm[2] is defined }}" required>
+                        <button type="submit" class="convert-btn">Convert</button>
+                    </form>
+                </div>
+                <div class="form-group">
+                    <form action="/developers/coordinate-converter" method="post">
+                        <label>MGRS</label>
+                        <input type="hidden" name="coord_type" value="mgrs">
+                        <input type="text" name="mgrs_coord" placeholder="MGRS" class="coordinate-input-field" value="{{ result.mgrs if result and result.mgrs is defined }}" required>
+                        <button type="submit" class="convert-btn">Convert</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 출력 좌표 -->
+            <div class="output-results">
+                {% if result %}
+                    {% if result.error %}
+                        <div class="result-item">
+                            <div class="result-value"><p style="color:red">{{ result.error }}</p></div>
+                        </div>
+                    {% else %}
+                        <div id="map" style="width:100%; height:100%;"></div>
+                        
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.1.0/ol.css">
+                        <script src="https://cdn.jsdelivr.net/npm/ol@v9.1.0/dist/ol.js">
+                        </script>
+                        <script>
+                            
+                            const coords = ol.proj.fromLonLat([{{ result.lon }}, {{ result.lat }}]);
+                            const marker = new ol.Feature({ geometry: new ol.geom.Point(coords) });
+                            marker.setStyle(new ol.style.Style({
+                                image: new ol.style.Icon({
+                                    anchor: [0.5, 1],
+                                    src: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg',
+                                    scale: 0.9
+                                })
+                            }));
+                            const map = new ol.Map({
+                                target: 'map',
+                                layers: [
+                                    new ol.layer.Tile({ source: new ol.source.OSM() }),
+                                    new ol.layer.Vector({ source: new ol.source.Vector({ features: [marker] }) })
+                                ],
+                                view: new ol.View({ center: coords, zoom: 10 })
+                            });
+                        </script>
+                    {% endif %}
+                {% else %}
+                    <div class="result-item">
+                        <div class="result-value">좌표 변환 결과가 없습니다.</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.tool-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.converter-section,
+.coordinate-info-section {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.converter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.coordinate-input,
+.coordinate-output {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ddd;
+}
+
+.coordinate-input h3,
+.coordinate-output h3 {
+    color: #262730;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #262730;
+}
+
+.coordinate-input-field {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    width: 48%;
+}
+
+.coordinate-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.convert-btn {
+    background-color: #ff4b4b;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 97%;
+    margin-top: 1rem;
+}
+
+.convert-btn:hover {
+    background-color: #e03e3e;
+}
+
+.output-results {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #e0e0e6;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 0.25rem;
+}
+
+.result-value {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #ff4b4b;
+}
+</style>
+{% endblock %}
