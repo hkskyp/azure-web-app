@@ -1,4 +1,5 @@
 import streamlit as st
+from PIL import Image
 
 # --- 페이지 설정 ---
 st.set_page_config(
@@ -36,5 +37,4 @@ with left_column:
         """
     )
 with right_column:
-    # st.image(Image.open("images/sample.png")) # 회사 관련 이미지 삽입
-    st.empty() # 이미지가 없을 경우 비워둠
+    st.image(Image.open("pages/home/intro.png"))
