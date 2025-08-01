@@ -5,7 +5,7 @@
 {% block content %}
 <div class="page-header">
     <h1 class="page-title">🗺️ Geographic Coordinate Converter</h1>
-    <p class="page-description">다양한 지리 좌표계 간의 변환을 수행합니다.</p>
+    <p class="page-description">Perform conversions between various geographic coordinate systems.</p>
 </div>
 
 <hr class="divider">
@@ -13,7 +13,7 @@
 <div class="tool-container">
     <!-- 좌표 입력 섹션 -->
     <div class="coordinate-section">
-        <h2 class="section-header">좌표 변환</h2>
+        <h2 class="section-header">Coordinate Conversion</h2>
         <div class="converter-grid">
             <!-- 입력 좌표 -->
             <div class="coordinate-fields">
@@ -83,7 +83,7 @@
                     {% endif %}
                 {% else %}
                     <div class="result-item">
-                        <div class="result-value">좌표 변환 결과가 없습니다.</div>
+                        <div class="result-value">No coordinate conversion results available.</div>
                     </div>
                 {% endif %}
             </div>
@@ -112,6 +112,18 @@
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     margin-top: 1rem;
+}
+
+/* 반응형 디자인: 너비가 1200px 이하일 때만 세로 레이아웃 */
+@media (max-width: 1200px) {
+    .converter-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+    
+    .output-results {
+        min-height: 500px;
+    }
 }
 
 .coordinate-input,
