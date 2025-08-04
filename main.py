@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import PlainTextResponse
 from coordinate_converter import CoordinateConverter
 
 # FastAPI 앱 생성
@@ -24,6 +25,12 @@ async def root():
     """루트 경로를 홈으로 리다이렉트"""
     return RedirectResponse(url="/home")
 
+# robots.txt를 루트 경로에서 직접 서빙
+@app.get("/robots.txt", response_class=PlainTextResponse)
+async def robots_txt():
+    with open("static/robots.txt", "r") as f:
+        return f.read()
+    
 @app.get("/home", response_class=HTMLResponse)
 async def home_page(request: Request):
     """홈 페이지"""
