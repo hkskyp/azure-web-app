@@ -19,7 +19,11 @@
     <!-- 사이드바 -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="/" style="text-decoration:none"><h2>🚀 LucaSoft</h2></a>
+            <a href="/" style="text-decoration:none">
+                <h2>
+                    <img src="{{ url_for('static', path='images/logo.png') }}" alt="LucaSoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">LucaSoft
+                </h2>
+            </a>
             <button class="sidebar-toggle" id="sidebarToggle">☰</button>
         </div>
         
@@ -65,7 +69,9 @@
         <!-- 데스크톱 헤더 (사이드바 축소 시) -->
         <div class="desktop-header" id="desktopHeader" style="display: none;">
             <button class="desktop-menu-btn" id="desktopMenuBtn">☰</button>
-            <h1>🚀 LucaSoft</h1>
+            <h1>
+                <img src="{{ url_for('static', path='images/logo.png') }}" alt="LucaSoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">LucaSoft
+            </h1>
         </div>
         
         <!-- 모바일 헤더 -->
