@@ -21,8 +21,8 @@
                     <form action="/developers/coordinate-converter" method="post">
                         <label>Latitude/Longitude</label>
                         <input type="hidden" name="coord_type" value="latlon">
-                        <input type="number" step="0.000001" name="lat" placeholder="Latitude" class="coordinate-input-field" value="{{ result.lat if result and result.lat is defined else 37.5 }}" required>
-                        <input type="number" step="0.000001" name="lon" placeholder="Longitude" class="coordinate-input-field" value="{{ result.lon if result and result.lon is defined else 127.0 }}" required>
+                        <input type="number" step="0.000001" name="lat" placeholder="Latitude" class="coordinate-input-field" value="{{ result.lat if result and result.lat is defined else 36.367847 }}" required>
+                        <input type="number" step="0.000001" name="lon" placeholder="Longitude" class="coordinate-input-field" value="{{ result.lon if result and result.lon is defined else 127.382646 }}" required>
                         <button type="submit" class="convert-btn">Convert</button>
                     </form>
                 </div>
