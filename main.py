@@ -35,7 +35,7 @@ async def robots_txt():
 async def home_page(request: Request):
     """홈 페이지"""
     return templates.TemplateResponse(
-        "intro/home.html", 
+        "home/intro.html", 
         {"request": request, "current_page": "home"}
     )
 
@@ -43,7 +43,7 @@ async def home_page(request: Request):
 async def history_page(request: Request):
     """회사 연혁 페이지"""
     return templates.TemplateResponse(
-        "intro/history.html",
+        "home/history.html",
         {"request": request, "current_page": "history"}
     )
 
@@ -51,7 +51,7 @@ async def history_page(request: Request):
 async def contact_page(request: Request):
     """연락처 페이지"""
     return templates.TemplateResponse(
-        "intro/contact.html", 
+        "home/contact.html", 
         {"request": request, "current_page": "contact"}
     )
 
