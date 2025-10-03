@@ -9,7 +9,7 @@
     <meta property="og:title" content="[lucasoft] | SW 개발 전문">
     <meta property="og:description" content="LucaSoft는 SW 개발 전문 회사로 웹, 앱, AI 기반 솔루션을 제공합니다. 고객의 아이디어를 현실로 만드는 파트너입니다.">
     <meta property="og:image" content="https://lucasoft.ai.kr/static/images/logo.png">
-    <meta property="og:image:alt" content="LucaSoft Logo">
+    <meta property="og:image:alt" content="Lucasoft Logo">
     <meta property="og:url" content="https://lucasoft.ai.kr">
     <title>{% block title %}[lucasoft] | SW 개발 전문{% endblock %}</title>
     <link rel="icon" href="🚀" type="image/x-icon">
@@ -22,7 +22,7 @@
         <div class="sidebar-header">
             <a href="/" style="text-decoration:none">
                 <h2>
-                    <img src="{{ url_for('static', path='images/logo.png') }}" alt="LucaSoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">LucaSoft
+                    <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">Lucasoft
                 </h2>
             </a>
             <button class="sidebar-toggle" id="sidebarToggle">☰</button>
@@ -35,7 +35,12 @@
                 <ul class="nav-menu">
                     <li>
                         <a href="/home" class="nav-link {% if current_page == 'home' %}active{% endif %}">
-                            🏠 Home
+                            🏠 Intro
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/history" class="nav-link {% if current_page == 'history' %}active{% endif %}">
+                            📜 History
                         </a>
                     </li>
                     <li>
@@ -71,7 +76,7 @@
         <div class="desktop-header" id="desktopHeader" style="display: none;">
             <button class="desktop-menu-btn" id="desktopMenuBtn">☰</button>
             <h1>
-                <img src="{{ url_for('static', path='images/logo.png') }}" alt="LucaSoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">LucaSoft
+                <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">Lucasoft
             </h1>
         </div>
         
@@ -79,7 +84,7 @@
         <div class="mobile-header">
             <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
             <h1>
-                <img src="{{ url_for('static', path='images/logo.png') }}" alt="LucaSoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">LucaSoft
+                <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">Lucasoft
             </h1>
         </div>
 
@@ -106,7 +111,7 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 Lucasoft Inc. All rights reserved.</p>
+                <p>Copyright &copy; 2025 Lucasoft Inc. All rights reserved.</p>
             </div>
         </footer>
     </div>

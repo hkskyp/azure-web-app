@@ -39,6 +39,14 @@ async def home_page(request: Request):
         {"request": request, "current_page": "home"}
     )
 
+@app.get("/history", response_class=HTMLResponse)
+async def history_page(request: Request):
+    """회사 연혁 페이지"""
+    return templates.TemplateResponse(
+        "intro/history.html",
+        {"request": request, "current_page": "history"}
+    )
+
 @app.get("/contact", response_class=HTMLResponse)
 async def contact_page(request: Request):
     """연락처 페이지"""
@@ -62,6 +70,7 @@ async def coordinate_converter_page(request: Request):
         "developers/coordinate_converter.html", 
         {"request": request, "current_page": "coordinate-converter"}
     )
+
 
 @app.post("/developers/coordinate-converter", response_class=HTMLResponse)
 async def convert_coordinates(
