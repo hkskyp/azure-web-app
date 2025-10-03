@@ -55,6 +55,14 @@ async def contact_page(request: Request):
         {"request": request, "current_page": "contact"}
     )
 
+@app.get("/products/rearchai", response_class=HTMLResponse)
+async def rearchai_page(request: Request):
+    """ReArchAI 페이지"""
+    return templates.TemplateResponse(
+        "products/rearchai.html",
+        {"request": request, "current_page": "rearchai"}
+    )
+
 @app.get("/developers/float-bits", response_class=HTMLResponse)
 async def float_bits_page(request: Request):
     """IEEE 754 부동소수점 비트 표현 분석기"""
