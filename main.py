@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.responses import PlainTextResponse
+from starlette.middleware.gzip import GZipMiddleware
 from coordinate_converter import CoordinateConverter
 from data.certificates import CERTIFICATES
 
@@ -12,6 +13,9 @@ app = FastAPI(
     description="고객의 아이디어를 현실로 만드는 SW 개발 파트너",
     version="1.0.0"
 )
+
+# GZip 압축 미들웨어 (500바이트 이상 응답 압축)
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # 정적 파일 서빙 설정
 app.mount("/static", StaticFiles(directory="static"), name="static")
