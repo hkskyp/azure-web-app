@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.responses import PlainTextResponse
 from coordinate_converter import CoordinateConverter
+from data.certificates import CERTIFICATES
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -51,8 +52,16 @@ async def history_page(request: Request):
 async def contact_page(request: Request):
     """연락처 페이지"""
     return templates.TemplateResponse(
-        "home/contact.html", 
+        "home/contact.html",
         {"request": request, "current_page": "contact"}
+    )
+
+@app.get("/certificate", response_class=HTMLResponse)
+async def certificate_page(request: Request):
+    """인증현황 페이지"""
+    return templates.TemplateResponse(
+        "home/certificate.html",
+        {"request": request, "current_page": "certificate", "certificates": CERTIFICATES}
     )
 
 @app.get("/products/rearchai", response_class=HTMLResponse)
