@@ -275,8 +275,22 @@ body {
 
 /* ===== 메인 콘텐츠 ===== */
 .main-content {
+    position: relative;
     margin-top: var(--header-height);
     min-height: calc(100vh - var(--header-height));
+}
+
+.main-content::before {
+    content: '';
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle, rgba(255, 75, 75, 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    z-index: -1;
 }
 
 /* 콘텐츠 래퍼 (일반 페이지용) */
@@ -292,11 +306,26 @@ body {
     min-height: 80vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(135deg, var(--primary-color) 0%, #ff7b7b 50%, #fff 50%);
+    justify-content: center;
+    background: transparent;
     overflow: hidden;
 }
 
+.hero-section::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255, 75, 75, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+}
+
 .hero-container {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
@@ -309,7 +338,13 @@ body {
 
 .hero-content {
     color: var(--bg-white);
-    padding-right: 2rem;
+    padding: 2.5rem;
+    background: rgba(139, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .hero-subtitle {
@@ -336,19 +371,21 @@ body {
 .hero-button {
     display: inline-block;
     padding: 1rem 2.5rem;
-    background-color: var(--bg-white);
+    background: var(--bg-white);
     color: var(--primary-color);
     text-decoration: none;
     font-size: 1.1rem;
     font-weight: 600;
     border-radius: 50px;
+    border: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .hero-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    background: var(--bg-white);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .hero-image {
@@ -940,22 +977,22 @@ body {
 
     .hero-section {
         min-height: auto;
-        background: linear-gradient(180deg, var(--primary-color) 0%, #ff7b7b 60%, #fff 60%);
+        background: transparent;
     }
 
     .hero-container {
         grid-template-columns: 1fr;
         gap: 2rem;
         padding: 3rem 1.5rem;
-        text-align: center;
     }
 
     .hero-content {
-        padding-right: 0;
+        padding: 1.5rem;
+        text-align: center;
     }
 
     .hero-title {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
 
     .hero-description {
@@ -1067,11 +1104,24 @@ body {
 
 /* 히어로 섹션 애니메이션 */
 .hero-content {
-    animation: fadeInLeft 1s ease-out;
+    animation: glassIn 0.8s ease-out;
 }
 
 .hero-image {
-    animation: fadeInRight 1s ease-out 0.3s both;
+    animation: fadeInRight 0.8s ease-out 0.2s both;
+}
+
+@keyframes glassIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+        backdrop-filter: blur(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        backdrop-filter: blur(10px);
+    }
 }
 
 @keyframes fadeInLeft {
