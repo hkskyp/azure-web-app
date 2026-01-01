@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -22,6 +23,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 템플릿 설정
 templates = Jinja2Templates(directory="templates")
+templates.env.globals["current_year"] = datetime.now().year
 
 converter = CoordinateConverter()
 
