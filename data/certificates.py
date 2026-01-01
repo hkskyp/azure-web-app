@@ -11,7 +11,7 @@ CERTIFICATES = [
     },
     # {
     #     "name": "인증서명",
-    #     "image": "파일명.png",
+    #     "image": "파일명.webp",
     #     "number": "발급번호",
     #     "date": "2025.01"
     # },

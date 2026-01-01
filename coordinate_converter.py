@@ -1,4 +1,3 @@
-# converter.py
 import mgrs
 import utm
 from typing import Tuple

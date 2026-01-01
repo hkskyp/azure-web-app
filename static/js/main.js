@@ -8,18 +8,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileClose = document.getElementById('mobileClose');
 
     // 헤더 스크롤 효과
-    let lastScroll = 0;
     window.addEventListener('scroll', function() {
-        const currentScroll = window.pageYOffset;
-
-        // 스크롤 시 헤더에 그림자 추가
-        if (currentScroll > 10) {
+        if (window.pageYOffset > 10) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
-
-        lastScroll = currentScroll;
     });
 
     // 모바일 메뉴 열기
@@ -100,45 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-// 페이지 로딩 상태 표시
-function showPageLoading() {
-    const loadingIndicator = document.createElement('div');
-    loadingIndicator.className = 'page-loading';
-    loadingIndicator.innerHTML = '<div class="loading-spinner"></div>';
-    loadingIndicator.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-    `;
-    document.body.appendChild(loadingIndicator);
-}
-
-function hidePageLoading() {
-    const loadingIndicator = document.querySelector('.page-loading');
-    if (loadingIndicator) {
-        loadingIndicator.remove();
-    }
-}
-
-// 페이지 전환 시 로딩 표시
-document.addEventListener('click', function(e) {
-    const link = e.target.closest('a[href^="/"]');
-    if (link && !link.target && !link.hasAttribute('download')) {
-        showPageLoading();
-        setTimeout(hidePageLoading, 1000);
-    }
-});
-
-// 페이지 로드 완료 시 로딩 숨기기
-window.addEventListener('load', hidePageLoading);
 
 // ===== 스크롤 애니메이션 (Intersection Observer) =====
 document.addEventListener('DOMContentLoaded', function() {

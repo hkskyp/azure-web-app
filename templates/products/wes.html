@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% block title %}WES - Weapon Effectiveness Simulation | Lucasoft{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --primary: #ff4b4b;
+    --primary-strong: #e03f3f;
+    --primary-soft: #ffeaea;
+    --muted: #555;
+    --card-bg: #fff;
+    --card-border: #e6e9ee;
+}
+
+.page-section {
+    margin: 1.6rem 0;
+    padding: 0;
+}
+
+.jws-hero {
+    padding: 2.5rem 1.5rem;
+    background: linear-gradient(90deg, rgba(255,75,75,0.06), rgba(255,255,255,0));
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+}
+
+.jws-hero h2 { margin: 0 0 .5rem 0; font-size: 1.75rem; color: var(--primary-strong); }
+.jws-hero p { margin: 0; color: var(--muted); }
+
+.callout-local {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(255,75,75,0.04), rgba(255,75,75,0.02));
+    border-left: 4px solid var(--primary);
+    border-radius: 6px;
+    color: #222;
+}
+
+.callout-local strong { color: var(--primary-strong); }
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 1.25rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.03);
+}
+
+.feature-card h4 { margin: 0 0 .5rem 0; color: #111; }
+.feature-card p { margin: 0; color: #444; font-size: 0.95rem; line-height: 1.6; }
+
+.badge {
+    display: inline-block;
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: .2rem .5rem;
+    border-radius: 4px;
+    font-size: .85rem;
+    margin-bottom: .5rem;
+}
+
+.spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.spec-table th, .spec-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.spec-table th {
+    background: var(--primary-soft);
+    color: var(--primary-strong);
+    font-weight: 600;
+}
+
+.spec-table tr:hover {
+    background: rgba(255,75,75,0.02);
+}
+
+.screenshot-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.screenshot-item {
+    text-align: center;
+}
+
+.screenshot-item img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid var(--card-border);
+}
+
+.screenshot-item p {
+    margin-top: 0.75rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.cta {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+}
+
+.btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: .6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s ease;
+}
+
+.btn:hover { background: var(--primary-strong); }
+
+.btn.secondary {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--card-border);
+}
+
+.btn.secondary:hover {
+    background: var(--primary-soft);
+}
+
+.highlight-box {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.highlight-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+}
+
+.highlight-item .number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.highlight-item .label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 600px) {
+    .jws-hero h2 { font-size: 1.4rem; }
+    .screenshot-gallery { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">💥 무장 효과 분석 시뮬레이션</h1>
+    <p class="page-description">WES — Weapon Effectiveness Simulation</p>
+</div>
+
+<div class="product-container">
+    <section class="page-section">
+        <div class="callout-local">
+            <strong>"Weaponeering: Conventional Weapon System Effectiveness"</strong> (Morris Driels) 이론을 기반으로 개발된 무장 효과 분석 시뮬레이션 시스템입니다.<br>
+            DEVS 형식론과 Monte Carlo 시뮬레이션을 결합하여 <strong>살상 확률(PK)</strong>, <strong>필요 무장 수량</strong>, <strong>취약성 평가</strong> 등을 과학적으로 분석합니다.
+        </div>
+    </section>
+
+    <section class="page-section">
+        <h3><strong>핵심 성능</strong></h3>
+        <div class="highlight-box">
+            <div class="highlight-item">
+                <div class="number">2천만</div>
+                <div class="label">초당 시뮬레이션 처리</div>
+            </div>
+            <div class="highlight-item">
+                <div class="number">&lt;1ms</div>
+                <div class="label">10K 시뮬레이션</div>
+            </div>
+            <div class="highlight-item">
+                <div class="number">40+</div>
+                <div class="label">무장 데이터</div>
+            </div>
+            <div class="highlight-item">
+                <div class="number">45+</div>
+                <div class="label">표적 데이터</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section">
+        <h3><strong>주요 기능</strong></h3>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="badge">시뮬레이션</span>
+                <h4>Monte Carlo 시뮬레이션</h4>
+                <p>확률적 탄착점 분포 시뮬레이션으로 10,000회 시뮬레이션을 1ms 이내 처리. 병렬 처리로 대규모 분석을 지원하며 시드 고정으로 결과 재현성을 보장합니다.</p>
+            </div>
+            <div class="feature-card">
+                <span class="badge">시뮬레이션</span>
+                <h4>DEVS 이산사건 시뮬레이션</h4>
+                <p>시간 기반 교전 시뮬레이션으로 무장-표적 상호작용 모델링. 이벤트 기반 상태 전이를 통해 실제 교전 상황을 시뮬레이션합니다.</p>
+            </div>
+            <div class="feature-card">
+                <span class="badge">계산</span>
+                <h4>CEP/PK 계산</h4>
+                <p>Pitman 방정식, Cookie Cutter, Carlton 모델 등 다양한 계산 모델을 지원. 다발 투발 시 누적 살상 확률까지 정밀하게 계산합니다.</p>
+            </div>
+            <div class="feature-card">
+                <span class="badge">분석</span>
+                <h4>취약성 평가 (Kill Tree)</h4>
+                <p>OR/AND 논리에 따른 표적 무력화 조건 분석. 구성요소별 치명도 평가와 여분(Redundancy)을 고려한 정밀 분석을 제공합니다.</p>
+            </div>
+            <div class="feature-card">
+                <span class="badge">비교</span>
+                <h4>시나리오 비교 분석</h4>
+                <p>최대 10개 시나리오를 동시에 비교. 무장별/표적별 효과 비교와 레이더 차트 시각화로 직관적인 분석 결과를 제공합니다.</p>
+            </div>
+            <div class="feature-card">
+                <span class="badge">보고서</span>
+                <h4>자동 보고서 생성</h4>
+                <p>Word(.docx), PDF(.pdf) 형식의 분석 보고서를 자동 생성. 시나리오 요약, 시뮬레이션 결과, 통계 분석, 시각화 차트를 포함합니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section">
+        <h3><strong>화면 구성</strong></h3>
+        <div class="screenshot-gallery">
+            <div class="screenshot-item">
+                <img src="{{ url_for('static', path='images/products/wes/dashboard.webp') }}" alt="WES 통합 분석 대시보드">
+                <p>통합 분석 대시보드 - 표적/구성요소/탄착점 분석</p>
+            </div>
+            <div class="screenshot-item">
+                <img src="{{ url_for('static', path='images/products/wes/devs-simulation.webp') }}" alt="WES DEVS 시뮬레이션">
+                <p>DEVS 시뮬레이션 - 교전 타임라인 분석</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section">
+        <h3><strong>품질 보증</strong></h3>
+        <div class="highlight-box">
+            <div class="highlight-item">
+                <div class="number">300</div>
+                <div class="label">테스트 케이스</div>
+            </div>
+            <div class="highlight-item">
+                <div class="number">99.7%</div>
+                <div class="label">테스트 통과율</div>
+            </div>
+            <div class="highlight-item">
+                <div class="number">&lt;0.1%</div>
+                <div class="label">이론 검증 오차</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section">
+        <h3><strong>도입 문의</strong></h3>
+        <div class="cta">
+            <a class="btn" href="/contact">문의하기</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

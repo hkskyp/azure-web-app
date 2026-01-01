@@ -76,6 +76,14 @@ async def rearchai_page(request: Request):
         {"request": request, "current_page": "rearchai"}
     )
 
+@app.get("/products/wes", response_class=HTMLResponse)
+async def wes_page(request: Request):
+    """WES 무장 효과 분석 시뮬레이션 페이지"""
+    return templates.TemplateResponse(
+        "products/wes.html",
+        {"request": request, "current_page": "wes"}
+    )
+
 @app.get("/developers/float-bits", response_class=HTMLResponse)
 async def float_bits_page(request: Request):
     """IEEE 754 부동소수점 비트 표현 분석기"""

@@ -54,12 +54,13 @@ document.fonts.ready.then(function() {
 
                     <!-- 제품/서비스 -->
                     <li class="nav-item has-dropdown">
-                        <a href="/products/rearchai" class="nav-link {% if current_page == 'rearchai' %}active{% endif %}">
+                        <a href="/products/rearchai" class="nav-link {% if current_page in ['rearchai', 'wes'] %}active{% endif %}">
                             제품/서비스
                             <span class="dropdown-arrow">▼</span>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="/products/rearchai" class="{% if current_page == 'rearchai' %}active{% endif %}">ReArchAI</a></li>
+                            <li><a href="/products/wes" class="{% if current_page == 'wes' %}active{% endif %}">WES</a></li>
                         </ul>
                     </li>
 
@@ -112,6 +113,7 @@ document.fonts.ready.then(function() {
                 <span class="mobile-section-title">제품/서비스</span>
                 <ul class="mobile-sub-list">
                     <li><a href="/products/rearchai" class="{% if current_page == 'rearchai' %}active{% endif %}">ReArchAI</a></li>
+                    <li><a href="/products/wes" class="{% if current_page == 'wes' %}active{% endif %}">WES</a></li>
                 </ul>
             </li>
             <li class="mobile-nav-section">
