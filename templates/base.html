@@ -13,12 +13,19 @@
     <meta property="og:url" content="https://lucasoft.ai.kr">
     <title>{% block title %}[lucasoft] | SW 개발 전문{% endblock %}</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="fonts-loading">
+<script>
+document.fonts.ready.then(function() {
+    document.body.classList.remove('fonts-loading');
+    document.body.classList.add('fonts-loaded');
+});
+</script>
     <!-- 상단 네비게이션 바 -->
     <header class="header" id="header">
         <div class="header-container">

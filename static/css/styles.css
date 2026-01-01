@@ -26,6 +26,15 @@ body {
     overflow-x: hidden;
 }
 
+/* 폰트 로딩 완료 전 깜빡임 방지 */
+.fonts-loading {
+    visibility: hidden;
+}
+
+.fonts-loaded {
+    visibility: visible;
+}
+
 /* ===== 상단 네비게이션 바 ===== */
 .header {
     position: fixed;
@@ -407,7 +416,26 @@ body {
 }
 
 .section-light {
-    background-color: var(--bg-light);
+    position: relative;
+    background-color: rgba(248, 249, 250, 0.75);
+}
+
+.section-light::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle, rgba(255, 75, 75, 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.section-light > * {
+    position: relative;
+    z-index: 1;
 }
 
 .section-container {
