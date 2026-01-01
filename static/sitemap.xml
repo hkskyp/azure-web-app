@@ -1,33 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">	  	  
-<!-- www.check-domains.com sitemap generator -->
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
    <loc>https://lucasoft.ai.kr/</loc>
-   <lastmod>2025-10-03T12:42:18+00:00</lastmod>
+   <lastmod>2026-01-01T00:00:00+09:00</lastmod>
    <changefreq>monthly</changefreq>
-   <priority>1.0000</priority>
+   <priority>1.0</priority>
+</url>
+<url>
+   <loc>https://lucasoft.ai.kr/history</loc>
+   <lastmod>2026-01-01T00:00:00+09:00</lastmod>
+   <changefreq>monthly</changefreq>
+   <priority>0.8</priority>
+</url>
+<url>
+   <loc>https://lucasoft.ai.kr/contact</loc>
+   <lastmod>2026-01-01T00:00:00+09:00</lastmod>
+   <changefreq>monthly</changefreq>
+   <priority>0.8</priority>
+</url>
+<url>
+   <loc>https://lucasoft.ai.kr/certificate</loc>
+   <lastmod>2026-01-01T00:00:00+09:00</lastmod>
+   <changefreq>monthly</changefreq>
+   <priority>0.8</priority>
 </url>
 <url>
    <loc>https://lucasoft.ai.kr/products/rearchai</loc>
-   <lastmod>2025-10-03T12:42:18+00:00</lastmod>
+   <lastmod>2026-01-01T00:00:00+09:00</lastmod>
    <changefreq>monthly</changefreq>
-   <priority>1.0000</priority>
+   <priority>0.9</priority>
+</url>
+<url>
+   <loc>https://lucasoft.ai.kr/products/wes</loc>
+   <lastmod>2026-01-01T00:00:00+09:00</lastmod>
+   <changefreq>monthly</changefreq>
+   <priority>0.9</priority>
 </url>
 <url>
    <loc>https://lucasoft.ai.kr/developers/float-bits</loc>
-   <lastmod>2025-10-06T00:00:00+00:00</lastmod>
+   <lastmod>2026-01-01T00:00:00+09:00</lastmod>
    <changefreq>monthly</changefreq>
-   <priority>1.0000</priority>
+   <priority>0.7</priority>
 </url>
 <url>
-   <loc>https://lucasoft.ai.kr//developers/coordinate-converter</loc>
-   <lastmod>2025-10-06T00:00:00+00:00</lastmod>
+   <loc>https://lucasoft.ai.kr/developers/coordinate-converter</loc>
+   <lastmod>2026-01-01T00:00:00+09:00</lastmod>
    <changefreq>monthly</changefreq>
-   <priority>1.0000</priority>
+   <priority>0.7</priority>
 </url>
+
 </urlset>
