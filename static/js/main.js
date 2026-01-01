@@ -1,128 +1,123 @@
-
-// 페이지 로드 완료 시 로딩 숨기기는 위에서 처리됨// 사이드바 및 네비게이션 관련 JavaScript
+// 상단 네비게이션 및 모바일 메뉴 관련 JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const desktopMenuBtn = document.getElementById('desktopMenuBtn');
-    const desktopHeader = document.getElementById('desktopHeader');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const header = document.getElementById('header');
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const mobileClose = document.getElementById('mobileClose');
 
-    // 사이드바 토글 함수
-    function toggleSidebar() {
-        sidebar.classList.toggle('collapsed');
-        mainContent.classList.toggle('expanded');
-        
-        // 토글 버튼 아이콘 변경
-        const isCollapsed = sidebar.classList.contains('collapsed');
-        if (sidebarToggle) {
-            sidebarToggle.textContent = '☰';
-        }
-        
-        // 데스크톱 헤더 표시/숨김 (데스크톱에서만)
-        if (window.innerWidth > 768) {
-            if (isCollapsed) {
-                desktopHeader.style.display = 'flex';
-            } else {
-                desktopHeader.style.display = 'none';
-            }
-        }
-    }
+    // 헤더 스크롤 효과
+    let lastScroll = 0;
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset;
 
-    // 모바일 사이드바 열기
-    function openMobileSidebar() {
-        sidebar.classList.add('mobile-open');
-        sidebarOverlay.classList.add('active');
+        // 스크롤 시 헤더에 그림자 추가
+        if (currentScroll > 10) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+
+        lastScroll = currentScroll;
+    });
+
+    // 모바일 메뉴 열기
+    function openMobileMenu() {
+        mobileMenu.classList.add('active');
+        mobileOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+
+        // 햄버거 아이콘을 X로 변경
+        mobileToggle.classList.add('active');
     }
 
-    // 모바일 사이드바 닫기
-    function closeMobileSidebar() {
-        sidebar.classList.remove('mobile-open');
-        sidebarOverlay.classList.remove('active');
+    // 모바일 메뉴 닫기
+    function closeMobileMenu() {
+        mobileMenu.classList.remove('active');
+        mobileOverlay.classList.remove('active');
         document.body.style.overflow = '';
+
+        // X 아이콘을 햄버거로 변경
+        mobileToggle.classList.remove('active');
     }
 
     // 이벤트 리스너
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', toggleSidebar);
-    }
-
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', openMobileSidebar);
-    }
-
-    if (desktopMenuBtn) {
-        desktopMenuBtn.addEventListener('click', toggleSidebar);
-    }
-
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', closeMobileSidebar);
-    }
-
-    // ESC 키로 모바일 사이드바 닫기
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeMobileSidebar();
-        }
-    });
-
-    // 윈도우 리사이즈 시 모바일 사이드바 상태 정리
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            closeMobileSidebar();
-            // 데스크톱에서 사이드바 상태에 따라 헤더 표시/숨김
-            const isCollapsed = sidebar.classList.contains('collapsed');
-            if (isCollapsed) {
-                desktopHeader.style.display = 'flex';
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', function() {
+            if (mobileMenu.classList.contains('active')) {
+                closeMobileMenu();
             } else {
-                desktopHeader.style.display = 'none';
-            }
-        } else {
-            // 모바일에서는 데스크톱 헤더 숨김
-            desktopHeader.style.display = 'none';
-        }
-    });
-
-    // 네비게이션 링크 클릭 시 모바일에서 사이드바 닫기
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
-                closeMobileSidebar();
+                openMobileMenu();
             }
         });
-    });
-
-    // 현재 페이지에 따른 사이드바 섹션 하이라이트
-    const currentPath = window.location.pathname;
-    const activeLink = document.querySelector(`.nav-link[href="${currentPath}"]`);
-    
-    if (activeLink) {
-        // 활성 링크의 부모 섹션을 확장
-        const parentSection = activeLink.closest('.nav-section');
-        if (parentSection) {
-            parentSection.classList.add('expanded');
-        }
     }
 
-    // 네비게이션 섹션 접기/펼치기 (선택사항)
-    const sectionTitles = document.querySelectorAll('.nav-section-title');
-    sectionTitles.forEach(title => {
-        title.addEventListener('click', function() {
-            const section = this.closest('.nav-section');
-            section.classList.toggle('collapsed');
+    if (mobileClose) {
+        mobileClose.addEventListener('click', closeMobileMenu);
+    }
+
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', closeMobileMenu);
+    }
+
+    // ESC 키로 모바일 메뉴 닫기
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeMobileMenu();
+        }
+    });
+
+    // 윈도우 리사이즈 시 모바일 메뉴 상태 정리
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 992) {
+            closeMobileMenu();
+        }
+    });
+
+    // 모바일 메뉴 내 링크 클릭 시 메뉴 닫기
+    const mobileLinks = document.querySelectorAll('.mobile-sub-list a');
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+
+    // 부드러운 스크롤 (앵커 링크용)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('href');
+            if (targetId !== '#') {
+                e.preventDefault();
+                const target = document.querySelector(targetId);
+                if (target) {
+                    const headerHeight = header.offsetHeight;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }
         });
     });
 });
 
-// 페이지 로딩 상태 표시 (선택사항)
+// 페이지 로딩 상태 표시
 function showPageLoading() {
     const loadingIndicator = document.createElement('div');
     loadingIndicator.className = 'page-loading';
     loadingIndicator.innerHTML = '<div class="loading-spinner"></div>';
+    loadingIndicator.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    `;
     document.body.appendChild(loadingIndicator);
 }
 
@@ -136,22 +131,49 @@ function hidePageLoading() {
 // 페이지 전환 시 로딩 표시
 document.addEventListener('click', function(e) {
     const link = e.target.closest('a[href^="/"]');
-    if (link && !link.target) {
+    if (link && !link.target && !link.hasAttribute('download')) {
         showPageLoading();
-        // 실제 페이지 로드가 완료되면 hidePageLoading()이 호출됨
-        setTimeout(hidePageLoading, 1000); // 백업 타이머
+        setTimeout(hidePageLoading, 1000);
     }
 });
 
-    // 페이지 로드 시 초기 상태 설정
-    window.addEventListener('load', function() {
-        // 데스크톱에서 사이드바 상태 확인
-        if (window.innerWidth > 768) {
-            const isCollapsed = sidebar.classList.contains('collapsed');
-            if (isCollapsed) {
-                desktopHeader.style.display = 'flex';
-            } else {
-                desktopHeader.style.display = 'none';
+// 페이지 로드 완료 시 로딩 숨기기
+window.addEventListener('load', hidePageLoading);
+
+// ===== 스크롤 애니메이션 (Intersection Observer) =====
+document.addEventListener('DOMContentLoaded', function() {
+    // 애니메이션 대상 요소들
+    const animateElements = document.querySelectorAll('.scroll-animate, .section-header, .card');
+
+    // Intersection Observer 설정
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px 0px -50px 0px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                // 한 번 애니메이션 후 관찰 중지 (성능 최적화)
+                observer.unobserve(entry.target);
             }
-        }
+        });
+    }, observerOptions);
+
+    // 각 요소 관찰 시작
+    animateElements.forEach(el => {
+        observer.observe(el);
     });
+
+    // 카드에 순차 딜레이 추가
+    const cardGrids = document.querySelectorAll('.card-grid');
+    cardGrids.forEach(grid => {
+        const cards = grid.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.classList.add('scroll-animate');
+            card.classList.add(`delay-${(index % 4) + 1}`);
+        });
+    });
+});

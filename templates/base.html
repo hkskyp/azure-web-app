@@ -13,128 +13,150 @@
     <meta property="og:url" content="https://lucasoft.ai.kr">
     <title>{% block title %}[lucasoft] | SW 개발 전문{% endblock %}</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- 사이드바 -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <a href="/" style="text-decoration:none">
-                <h2>
-                    <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">Lucasoft
-                </h2>
+    <!-- 상단 네비게이션 바 -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <!-- 로고 -->
+            <a href="/" class="logo">
+                <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft">
+                <span>Lucasoft</span>
             </a>
-            <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+            <!-- 데스크톱 메뉴 -->
+            <nav class="nav-menu" id="navMenu">
+                <ul class="nav-list">
+                    <!-- 기업소개 -->
+                    <li class="nav-item has-dropdown">
+                        <a href="/home" class="nav-link {% if current_page in ['home', 'history', 'certificate', 'contact'] %}active{% endif %}">
+                            기업소개
+                            <span class="dropdown-arrow">▼</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/home" class="{% if current_page == 'home' %}active{% endif %}">회사소개</a></li>
+                            <li><a href="/history" class="{% if current_page == 'history' %}active{% endif %}">연혁</a></li>
+                            <li><a href="/certificate" class="{% if current_page == 'certificate' %}active{% endif %}">인증현황</a></li>
+                            <li><a href="/contact" class="{% if current_page == 'contact' %}active{% endif %}">연락처</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- 제품/서비스 -->
+                    <li class="nav-item has-dropdown">
+                        <a href="/products/rearchai" class="nav-link {% if current_page == 'rearchai' %}active{% endif %}">
+                            제품/서비스
+                            <span class="dropdown-arrow">▼</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/products/rearchai" class="{% if current_page == 'rearchai' %}active{% endif %}">ReArchAI</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- 개발자 도구 -->
+                    <li class="nav-item has-dropdown">
+                        <a href="/developers/float-bits" class="nav-link {% if current_page in ['float-bits', 'coordinate-converter'] %}active{% endif %}">
+                            개발자 도구
+                            <span class="dropdown-arrow">▼</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/developers/float-bits" class="{% if current_page == 'float-bits' %}active{% endif %}">IEEE 754 Analyzer</a></li>
+                            <li><a href="/developers/coordinate-converter" class="{% if current_page == 'coordinate-converter' %}active{% endif %}">Coordinate Converter</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- 모바일 햄버거 메뉴 -->
+            <button class="mobile-toggle" id="mobileToggle" aria-label="메뉴 열기">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
         </div>
-        
-        <nav class="sidebar-nav">
-            <!-- Home 섹션 -->
-            <div class="nav-section">
-                <h3 class="nav-section-title">Home</h3>
-                <ul class="nav-menu">
-                    <li>
-                        <a href="/home" class="nav-link {% if current_page == 'home' %}active{% endif %}">
-                            🏠 Intro
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/history" class="nav-link {% if current_page == 'history' %}active{% endif %}">
-                            📜 History
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/certificate" class="nav-link {% if current_page == 'certificate' %}active{% endif %}">
-                            🏆 Certificate
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/contact" class="nav-link {% if current_page == 'contact' %}active{% endif %}">
-                            📧 Contact
-                        </a>
-                    </li>
-                </ul>
-            </div>
+    </header>
 
-            <!-- Products 섹션 (추가) -->
-            <div class="nav-section">
-                <h2 class="nav-section-title">Products</h3>
-                <ul class="nav-menu">
-                    <li>
-                        <a href="/products/rearchai" class="nav-link {% if current_page == 'product-rearchai' %}active{% endif %}">
-                            🧩 ReArchAI
-                        </a>
-                    </li>
-                </ul>
-            </div>
+    <!-- 모바일 메뉴 오버레이 -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
 
-            <!-- Developer 섹션 -->
-            <div class="nav-section">
-                <h3 class="nav-section-title">Developer</h3>
-                <ul class="nav-menu">
-                    <li>
-                        <a href="/developers/float-bits" class="nav-link {% if current_page == 'float-bits' %}active{% endif %}">
-                            🔢 IEEE 754 Analyzer
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/developers/coordinate-converter" class="nav-link {% if current_page == 'coordinate-converter' %}active{% endif %}">
-                            🗺️ Coordinate Converter
-                        </a>
-                    </li>
+    <!-- 모바일 슬라이드 메뉴 -->
+    <nav class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <a href="/" class="logo">
+                <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft">
+                <span>Lucasoft</span>
+            </a>
+            <button class="mobile-close" id="mobileClose" aria-label="메뉴 닫기">✕</button>
+        </div>
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-section">
+                <span class="mobile-section-title">기업소개</span>
+                <ul class="mobile-sub-list">
+                    <li><a href="/home" class="{% if current_page == 'home' %}active{% endif %}">회사소개</a></li>
+                    <li><a href="/history" class="{% if current_page == 'history' %}active{% endif %}">연혁</a></li>
+                    <li><a href="/certificate" class="{% if current_page == 'certificate' %}active{% endif %}">인증현황</a></li>
+                    <li><a href="/contact" class="{% if current_page == 'contact' %}active{% endif %}">연락처</a></li>
                 </ul>
-            </div>
-        </nav>
-    </div>
+            </li>
+            <li class="mobile-nav-section">
+                <span class="mobile-section-title">제품/서비스</span>
+                <ul class="mobile-sub-list">
+                    <li><a href="/products/rearchai" class="{% if current_page == 'rearchai' %}active{% endif %}">ReArchAI</a></li>
+                </ul>
+            </li>
+            <li class="mobile-nav-section">
+                <span class="mobile-section-title">개발자 도구</span>
+                <ul class="mobile-sub-list">
+                    <li><a href="/developers/float-bits" class="{% if current_page == 'float-bits' %}active{% endif %}">IEEE 754 Analyzer</a></li>
+                    <li><a href="/developers/coordinate-converter" class="{% if current_page == 'coordinate-converter' %}active{% endif %}">Coordinate Converter</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
 
     <!-- 메인 콘텐츠 -->
-    <div class="main-content" id="mainContent">
-        <!-- 데스크톱 헤더 (사이드바 축소 시) -->
-        <div class="desktop-header" id="desktopHeader" style="display: none;">
-            <button class="desktop-menu-btn" id="desktopMenuBtn">☰</button>
-            <h1>
-                <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">Lucasoft
-            </h1>
-        </div>
-        
-        <!-- 모바일 헤더 -->
-        <div class="mobile-header">
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-            <h1>
-                <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft" style="height: 2em; vertical-align: middle; margin-right: 0.25em;">Lucasoft
-            </h1>
-        </div>
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
 
-        <!-- 페이지 콘텐츠 -->
-        <div class="content-wrapper">
-            {% block content %}{% endblock %}
-        </div>
-
-        <!-- 푸터 -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-info">
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-logo">
+                    <img src="{{ url_for('static', path='images/logo.png') }}" alt="Lucasoft">
+                    <span>Lucasoft</span>
+                </div>
+                <div class="footer-links">
+                    <a href="/home">회사소개</a>
+                    <a href="/history">연혁</a>
+                    <a href="/certificate">인증현황</a>
+                    <a href="/contact">연락처</a>
+                </div>
+            </div>
+            <div class="footer-info">
+                <div class="footer-row">
                     <span><strong>상호:</strong> 주식회사 루카소프트</span>
-                    <span>|</span>
+                    <span class="divider">|</span>
                     <span><strong>대표:</strong> 김현규</span>
-                    <span>|</span>
+                    <span class="divider">|</span>
                     <span><strong>사업자등록번호:</strong> 139-87-03586</span>
                 </div>
-                <div class="footer-contact">
+                <div class="footer-row">
                     <span><strong>주소:</strong> (우)35203 대전광역시 서구 둔산대로117번길 66, 12층 1201-17호(만년동, 골드타워)</span>
-                    <span>|</span>
+                </div>
+                <div class="footer-row">
                     <span><strong>이메일:</strong> support@lucasoft.ai.kr</span>
                 </div>
             </div>
-            
             <div class="footer-bottom">
                 <p>Copyright &copy; 2025 Lucasoft Inc. All rights reserved.</p>
             </div>
-        </footer>
-    </div>
-
-    <!-- 사이드바 오버레이 (모바일용) -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        </div>
+    </footer>
 
     <script src="/static/js/main.js"></script>
     {% block extra_js %}{% endblock %}

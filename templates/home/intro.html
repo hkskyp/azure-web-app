@@ -3,42 +3,105 @@
 {% block title %}[lucasoft] | SW 개발 전문 - Home{% endblock %}
 
 {% block content %}
-<!-- 헤더 섹션 -->
-<div class="header-section">
-    <h2 class="subtitle">안녕하세요! 저희는 [루카소프트]입니다.</h2>
-    <h1 class="main-title">고객의 아이디어를 현실로 만드는 SW 개발 파트너</h1>
-    <p class="description">웹, 앱, AI 기반 솔루션까지. 비즈니스 성장을 위한 최적의 기술을 제공합니다.</p>
-    <div class="button-container">
-        <a href="/contact" class="service-button">서비스 둘러보기</a>
-    </div>
-</div>
-
-<!-- 구분선 -->
-<hr class="divider">
-
-<!-- 메인 콘텐츠 섹션 -->
-<div class="content-section">
-    <div class="content-grid">
-
-        <!-- 오른쪽 컬럼 - 이미지 -->
-        <div class="left-column">
-            <img src="{{ url_for('static', path='images/intro.png') }}" alt="루카소프트 소개 이미지" class="intro-image" width="80%" height="80%">
+<!-- 히어로 섹션 -->
+<section class="hero-section">
+    <div class="hero-container">
+        <div class="hero-content">
+            <p class="hero-subtitle">안녕하세요! 저희는 [루카소프트]입니다.</p>
+            <h1 class="hero-title">검증된 기술력,<br>확실한 결과</h1>
+            <p class="hero-description">M&S · 데이터 분석 · 시스템 현대화. 복잡한 기술 과제를 해결하는 SW 전문 기업입니다.</p>
+            <a href="/contact" class="hero-button">문의하기</a>
         </div>
-        
-        <!-- 왼쪽 컬럼 - 텍스트 -->
-        <div class="left-column">
-            <h2 class="section-header">우리가 하는 일</h2>
-            <div class="content-text">
-                <p>저희 [루카소프트]는 다년간의 경험을 갖춘 전문가들로 구성된 소프트웨어 개발 회사입니다.</p>
-                <ul class="service-list">
-                    <li><strong>웹/앱 개발</strong>: 최신 기술 스택을 활용한 반응형 웹사이트와 안정적인 모바일 앱을 개발합니다.</li>
-                    <li><strong>AI 솔루션</strong>: 머신러닝, 딥러닝 기술을 활용하여 데이터 기반의 지능형 서비스를 구축합니다.</li>
-                    <li><strong>UI/UX 디자인</strong>: 사용자 중심의 직관적이고 아름다운 디자인을 설계합니다.</li>
-                    <li><strong>클라우드/인프라</strong>: 확장성과 안정성을 고려한 최적의 클라우드 아키텍처를 설계하고 구축합니다.</li>
-                </ul>
-                <p>고객과의 긴밀한 소통을 통해 비즈니스 목표에 정확히 부합하는 결과물을 만들어냅니다.</p>
+        <div class="hero-image">
+            <img src="{{ url_for('static', path='images/intro.png') }}" alt="루카소프트 소개">
+        </div>
+    </div>
+</section>
+
+<!-- 서비스 소개 섹션 -->
+<section class="section section-light">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">우리가 하는 일</h2>
+            <p class="section-subtitle">시뮬레이션과 데이터 분석 분야의 전문 역량으로 최적의 솔루션을 제공합니다</p>
+        </div>
+        <div class="card-grid">
+            <div class="card card-featured">
+                <div class="card-icon">🎯</div>
+                <h3 class="card-title">시뮬레이션</h3>
+                <p class="card-description">국방/민간 분야의 M&S(Modeling & Simulation) 전문 기술력으로 정밀한 시뮬레이션 시스템을 구축합니다.</p>
+            </div>
+            <div class="card card-featured">
+                <div class="card-icon">📊</div>
+                <h3 class="card-title">데이터 분석</h3>
+                <p class="card-description">빅데이터 수집·처리·분석 파이프라인 구축과 AI/ML 기반 인사이트 도출로 데이터 기반 의사결정을 지원합니다.</p>
+            </div>
+            <div class="card card-featured">
+                <div class="card-icon">🔄</div>
+                <h3 class="card-title">레거시 현대화</h3>
+                <p class="card-description">노후화된 시스템을 분석하고 현대적인 아키텍처로 전환하여 유지보수성과 확장성을 향상시킵니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🤖</div>
+                <h3 class="card-title">AI 솔루션</h3>
+                <p class="card-description">머신러닝, 딥러닝 기술을 활용하여 데이터 기반의 지능형 서비스를 구축합니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">☁️</div>
+                <h3 class="card-title">클라우드/인프라</h3>
+                <p class="card-description">확장성과 안정성을 고려한 최적의 클라우드 아키텍처를 설계하고 구축합니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">💼</div>
+                <h3 class="card-title">기술 컨설팅</h3>
+                <p class="card-description">시스템 분석, 아키텍처 설계, 기술 로드맵 수립 등 전문 컨설팅 서비스를 제공합니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⚙️</div>
+                <h3 class="card-title">DevOps/자동화</h3>
+                <p class="card-description">CI/CD 파이프라인 구축, 배포 자동화, 인프라 코드화로 개발 생산성을 극대화합니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🌐</div>
+                <h3 class="card-title">웹/앱 개발</h3>
+                <p class="card-description">최신 기술 스택을 활용한 반응형 웹사이트와 안정적인 모바일 앱을 개발합니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🎨</div>
+                <h3 class="card-title">UI/UX 디자인</h3>
+                <p class="card-description">사용자 중심의 직관적이고 아름다운 디자인을 설계합니다.</p>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- 회사 소개 섹션 -->
+<section class="section">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">기업소개</h2>
+            <p class="section-subtitle">고객과의 긴밀한 소통을 통해 비즈니스 목표에 부합하는 결과물을 만들어냅니다</p>
+        </div>
+        <div class="card-grid">
+            <a href="/history" class="card" style="text-decoration: none;">
+                <div class="card-icon">📜</div>
+                <h3 class="card-title">연혁</h3>
+                <p class="card-description">루카소프트의 성장 과정과 주요 이정표를 확인하세요.</p>
+                <span class="card-link">자세히 보기 →</span>
+            </a>
+            <a href="/certificate" class="card" style="text-decoration: none;">
+                <div class="card-icon">🏆</div>
+                <h3 class="card-title">인증현황</h3>
+                <p class="card-description">기업부설연구소, 벤처기업 등 공식 인증 현황을 확인하세요.</p>
+                <span class="card-link">자세히 보기 →</span>
+            </a>
+            <a href="/contact" class="card" style="text-decoration: none;">
+                <div class="card-icon">📧</div>
+                <h3 class="card-title">연락처</h3>
+                <p class="card-description">프로젝트 문의 및 협업 제안을 기다립니다.</p>
+                <span class="card-link">자세히 보기 →</span>
+            </a>
+        </div>
+    </div>
+</section>
 {% endblock %}
