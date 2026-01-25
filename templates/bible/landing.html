@@ -162,8 +162,9 @@
 
 /* ===== 컨텐츠 컨테이너 ===== */
 .content-wrapper {
-    height: 600px;
+    height: 650px;
     position: relative;
+    padding-bottom: 2.5rem;
 }
 
 /* ===== 스크롤 컨테이너 (가로 스와이프) ===== */
@@ -478,7 +479,7 @@
 /* ===== 네비게이션 인디케이터 ===== */
 .nav-indicators {
     position: absolute;
-    bottom: 0.5rem;
+    bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -486,7 +487,7 @@
     z-index: 100;
     background: rgba(255, 255, 255, 0.9);
     padding: 0.5rem 1rem;
-    border-radius: 20px;
+    border-radius: 20px 20px 0 0;
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
 
@@ -561,7 +562,8 @@
     }
 
     .content-wrapper {
-        height: 500px;
+        height: 550px;
+        padding-bottom: 2.5rem;
     }
 
     .slide {
@@ -616,7 +618,7 @@
     }
 
     .nav-indicators {
-        bottom: 0.5rem;
+        bottom: 0;
         padding: 0.4rem 0.8rem;
     }
 }
