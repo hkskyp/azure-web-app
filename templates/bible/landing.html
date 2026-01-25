@@ -920,7 +920,12 @@ const App = {
     renderQuiz: function() {
         const verse = this.state.quizVerse;
         let text = verse.text;
-        const blindWords = verse.blind_words || [];
+
+        // blind_words가 비어있으면 자동 생성
+        let blindWords = verse.blind_words || [];
+        if (blindWords.length === 0) {
+            blindWords = this.generateBlindWords(text);
+        }
 
         const sortedWords = [...blindWords].sort((a, b) => b.length - a.length);
         const replacements = [];
@@ -961,6 +966,33 @@ const App = {
 
     escapeRegex: function(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    },
+
+    // ===== 자동 blind_words 생성 =====
+    generateBlindWords: function(text) {
+        // 구두점 제거하고 단어 추출
+        const words = text.replace(/[.,!?'"]/g, '').split(/\s+/);
+
+        // 3글자 이상 단어만 선택
+        const candidates = words.filter(word => {
+            // 한글: 2글자 이상, 영어: 4글자 이상
+            const isKorean = /[가-힣]/.test(word);
+            return isKorean ? word.length >= 2 : word.length >= 4;
+        });
+
+        // 중복 제거
+        const uniqueCandidates = [...new Set(candidates)];
+
+        // 랜덤으로 2-4개 선택
+        const count = Math.min(Math.floor(Math.random() * 3) + 2, uniqueCandidates.length);
+        const selected = [];
+        const shuffled = [...uniqueCandidates].sort(() => Math.random() - 0.5);
+
+        for (let i = 0; i < count; i++) {
+            selected.push(shuffled[i]);
+        }
+
+        return selected;
     },
 
     // ===== 네비게이션 설정 =====
