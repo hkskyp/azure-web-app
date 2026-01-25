@@ -9,6 +9,7 @@ from coordinate_converter import CoordinateConverter
 from data.certificates import CERTIFICATES
 from data.bible_verses import BIBLE_VERSES
 from data.bible_verses_en import BIBLE_VERSES_EN
+from data.bible_verses_seo import BIBLE_VERSES_SEO_KO, BIBLE_VERSES_SEO_EN
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -95,8 +96,8 @@ async def bible_landing_page(request: Request, lang: str = "ko"):
     if lang not in ["ko", "en"]:
         lang = "ko"
 
-    # 언어에 따라 다른 데이터 선택
-    all_verses = BIBLE_VERSES if lang == "ko" else BIBLE_VERSES_EN
+    # SEO용: 전체 30,923개 구절 (크롤러에게 노출)
+    all_verses_seo = BIBLE_VERSES_SEO_KO if lang == "ko" else BIBLE_VERSES_SEO_EN
 
     return templates.TemplateResponse(
         "bible/landing.html",
@@ -104,7 +105,7 @@ async def bible_landing_page(request: Request, lang: str = "ko"):
             "request": request,
             "current_page": "bible-landing",
             "lang": lang,
-            "all_verses": all_verses  # SEO용 전체 구절
+            "all_verses": all_verses_seo  # SEO용 전체 구절 (30,923개)
         }
     )
 
