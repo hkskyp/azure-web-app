@@ -15,11 +15,11 @@
 <meta property="og:description" content="Read inspiring daily Bible verses and test your memory with interactive quizzes. Free online Bible quotes to start your day.">
 {% endif %}
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}">
-<link rel="canonical" href="https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}">
-<link rel="alternate" hreflang="ko" href="https://lucasoft.ai.kr/bible-landing?lang=ko">
-<link rel="alternate" hreflang="en" href="https://lucasoft.ai.kr/bible-landing?lang=en">
-<link rel="alternate" hreflang="x-default" href="https://lucasoft.ai.kr/bible-landing?lang=en">
+<meta property="og:url" content="https://lucasoft.ai.kr/bible{% if lang == 'en' %}?lang=en{% endif %}">
+<link rel="canonical" href="https://lucasoft.ai.kr/bible{% if lang == 'en' %}?lang=en{% endif %}">
+<link rel="alternate" hreflang="ko" href="https://lucasoft.ai.kr/bible?lang=ko">
+<link rel="alternate" hreflang="en" href="https://lucasoft.ai.kr/bible?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://lucasoft.ai.kr/bible?lang=en">
 
 <!-- 구조화된 데이터 (Schema.org) - SEO 최적화: 전체 구절 크롤링 -->
 <script type="application/ld+json">
@@ -28,7 +28,7 @@
   "@type": "WebPage",
   "name": "{% if lang == 'ko' %}[lucasoft] | 매일 성경 구절{% else %}[lucasoft] | Inspiring Scripture{% endif %}",
   "description": "{% if lang == 'ko' %}매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요{% else %}Read inspiring daily Bible verses and test your memory with interactive quizzes{% endif %}",
-  "url": "https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}",
+  "url": "https://lucasoft.ai.kr/bible{% if lang == 'en' %}?lang=en{% endif %}",
   "inLanguage": "{{ lang }}",
   "hasPart": [
     {% for verse in all_verses %}

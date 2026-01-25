@@ -89,7 +89,7 @@ async def wes_page(request: Request):
         {"request": request, "current_page": "wes"}
     )
 
-@app.get("/bible-landing", response_class=HTMLResponse)
+@app.get("/bible", response_class=HTMLResponse)
 async def bible_landing_page(request: Request, lang: str = "ko"):
     """성경 구절 랜딩 페이지 (한국어/English)"""
     # 언어 파라미터 검증 (ko 또는 en만 허용)
@@ -103,7 +103,7 @@ async def bible_landing_page(request: Request, lang: str = "ko"):
         "bible/landing.html",
         {
             "request": request,
-            "current_page": "bible-landing",
+            "current_page": "bible",
             "lang": lang,
             "all_verses": all_verses_seo  # SEO용 전체 구절 (30,923개)
         }
