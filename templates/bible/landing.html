@@ -6,17 +6,18 @@
 <style>
 /* ===== 앱 컨테이너 ===== */
 .bible-app {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 0;
+}
+
+/* ===== 로딩 화면 ===== */
+.loading-screen {
     min-height: calc(100vh - 140px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* ===== 로딩 화면 ===== */
-.loading-screen {
     text-align: center;
     color: white;
 }
@@ -37,6 +38,11 @@
 
 /* ===== 에러 화면 ===== */
 .error-screen {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     color: white;
     padding: 2rem;
@@ -56,32 +62,67 @@
     cursor: pointer;
     font-size: 1rem;
     margin-top: 1rem;
+    transition: transform 0.2s ease;
 }
 
-/* ===== 구절 화면 ===== */
-.verse-screen {
-    display: none;
+.retry-btn:hover {
+    transform: scale(1.05);
+}
+
+/* ===== 컨텐츠 컨테이너 ===== */
+.content-wrapper {
     max-width: 800px;
-    width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
 }
 
-.verse-container {
+/* ===== 헤더 ===== */
+.page-header {
+    text-align: center;
+    color: white;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* ===== 구절 카드 ===== */
+.verse-card {
     background: rgba(255,255,255,0.95);
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    opacity: 1;
-    transition: opacity 0.3s ease;
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
 }
 
-.verse-container.fade-out {
-    opacity: 0;
+.verse-card:nth-child(1) { animation-delay: 0.1s; }
+.verse-card:nth-child(2) { animation-delay: 0.2s; }
+.verse-card:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .verse-image {
     width: 100%;
     height: 300px;
     overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .verse-image img {
@@ -95,6 +136,18 @@
     text-align: center;
 }
 
+.verse-number {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
 .verse-text {
     font-size: 1.5rem;
     line-height: 1.8;
@@ -106,103 +159,75 @@
 .verse-reference {
     color: #666;
     font-size: 1rem;
-}
-
-/* ===== 네비게이션 ===== */
-.navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-}
-
-.progress-dots {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-    transition: all 0.3s ease;
-}
-
-.dot.active {
-    background: white;
-    transform: scale(1.2);
-}
-
-.dot.completed {
-    background: rgba(255,255,255,0.8);
-}
-
-.next-btn {
-    background: white;
-    color: #764ba2;
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1rem;
     font-weight: 600;
-    transition: transform 0.2s ease;
 }
 
-.next-btn:hover {
-    transform: scale(1.05);
-}
-
-.next-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* ===== 퀴즈 화면 ===== */
-.quiz-screen {
-    display: none;
-    max-width: 800px;
-    width: 100%;
-}
-
-.quiz-container {
+/* ===== 퀴즈 섹션 ===== */
+.quiz-section {
     background: rgba(255,255,255,0.95);
     border-radius: 20px;
-    padding: 2rem;
+    padding: 3rem 2rem;
     text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.4s;
 }
 
 .quiz-title {
     color: #764ba2;
     margin-bottom: 1.5rem;
-    font-size: 1.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.quiz-subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
 }
 
 .quiz-text {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     line-height: 2;
     color: #333;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Noto Serif KR', serif;
 }
 
 .quiz-reference {
     color: #666;
     margin-bottom: 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
 /* ===== 블라인드 단어 ===== */
 .blind-word {
     display: inline-block;
     background: #e0e0e0;
-    color: #e0e0e0;
+    color: transparent;
     padding: 0.2rem 0.8rem;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 60px;
     text-align: center;
     user-select: none;
+    position: relative;
+    font-weight: 600;
+}
+
+.blind-word::after {
+    content: '?';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #999;
+    font-size: 1.2rem;
 }
 
 .blind-word:hover:not(.revealed) {
@@ -212,34 +237,30 @@
 
 .blind-word.revealed {
     background: #fff5f5;
-    color: var(--primary-color, #ff4b4b);
-    font-weight: 600;
-    animation: revealPop 0.3s ease;
+    color: #ff4b4b;
+    animation: revealPop 0.4s ease;
+}
+
+.blind-word.revealed::after {
+    display: none;
 }
 
 @keyframes revealPop {
     0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    50% { transform: scale(1.15); }
     100% { transform: scale(1); }
-}
-
-.restart-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-top: 1rem;
 }
 
 /* ===== 완료 메시지 ===== */
 .completion-msg {
     display: none;
     color: #4caf50;
-    font-weight: 600;
-    margin-top: 1rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+    padding: 1rem;
+    background: #f1f8f4;
+    border-radius: 10px;
 }
 
 .completion-msg.show {
@@ -252,10 +273,60 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* ===== 버튼 ===== */
+.restart-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* ===== 통계 정보 ===== */
+.quiz-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #764ba2;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
 /* ===== 반응형 ===== */
 @media (max-width: 768px) {
-    .bible-app {
-        padding: 1rem;
+    .page-header h1 {
+        font-size: 2rem;
+    }
+
+    .page-header p {
+        font-size: 1rem;
     }
 
     .verse-image {
@@ -270,10 +341,27 @@
         font-size: 1.1rem;
     }
 
-    .navigation {
+    .quiz-title {
+        font-size: 1.5rem;
+    }
+
+    .quiz-stats {
         flex-direction: column;
         gap: 1rem;
     }
+
+    .bible-app {
+        padding: 1rem 0;
+    }
+
+    .quiz-section {
+        padding: 2rem 1.5rem;
+    }
+}
+
+/* ===== 숨김 처리 ===== */
+.hidden {
+    display: none !important;
 }
 </style>
 {% endblock %}
@@ -287,43 +375,46 @@
     </div>
 
     <!-- 에러 화면 -->
-    <div id="errorScreen" class="error-screen" style="display: none;">
+    <div id="errorScreen" class="error-screen hidden">
         <div class="error-icon">😔</div>
         <p>말씀을 불러오는데 실패했습니다.</p>
         <button class="retry-btn" onclick="App.init()">다시 시도</button>
     </div>
 
-    <!-- 구절 표시 화면 -->
-    <div id="verseScreen" class="verse-screen">
-        <div id="verseContainer" class="verse-container">
-            <div class="verse-image">
-                <img id="verseImg" src="" alt="성경 이미지"
-                     onerror="this.src='/static/images/bible/placeholder.webp'">
-            </div>
-            <div class="verse-content">
-                <p id="verseText" class="verse-text"></p>
-                <p id="verseRef" class="verse-reference"></p>
-            </div>
+    <!-- 컨텐츠 -->
+    <div id="contentWrapper" class="content-wrapper hidden">
+        <!-- 헤더 -->
+        <div class="page-header">
+            <h1>오늘의 말씀</h1>
+            <p>하나님의 말씀으로 하루를 시작하세요</p>
         </div>
-        <div class="navigation">
-            <div class="progress-dots">
-                <span class="dot" data-index="0"></span>
-                <span class="dot" data-index="1"></span>
-                <span class="dot" data-index="2"></span>
-                <span class="dot" data-index="3"></span>
-            </div>
-            <button id="nextBtn" class="next-btn">다음</button>
-        </div>
-    </div>
 
-    <!-- 퀴즈 화면 -->
-    <div id="quizScreen" class="quiz-screen">
-        <div class="quiz-container">
-            <h2 class="quiz-title">기억하시나요?</h2>
+        <!-- 구절 카드 컨테이너 -->
+        <div id="versesContainer"></div>
+
+        <!-- 퀴즈 섹션 -->
+        <div id="quizSection" class="quiz-section">
+            <h2 class="quiz-title">🤔 기억하시나요?</h2>
+            <p class="quiz-subtitle">빈칸을 클릭하여 단어를 확인하세요</p>
             <p id="quizText" class="quiz-text"></p>
             <p id="quizRef" class="quiz-reference"></p>
-            <p id="completionMsg" class="completion-msg">모든 단어를 맞추셨습니다!</p>
-            <button class="restart-btn" onclick="App.restart()">다시 시작</button>
+
+            <div class="quiz-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="revealedCount">0</div>
+                    <div class="stat-label">맞춘 단어</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">전체 단어</div>
+                </div>
+            </div>
+
+            <p id="completionMsg" class="completion-msg">
+                🎉 축하합니다! 모든 단어를 맞추셨습니다!
+            </p>
+
+            <button class="restart-btn" onclick="App.restart()">🔄 다시 시작</button>
         </div>
     </div>
 </div>
@@ -335,10 +426,9 @@ const App = {
     // ===== 상태 관리 =====
     state: {
         verses: [],
-        currentIndex: 0,
         quizVerse: null,
-        revealedWords: new Set(),
-        isTransitioning: false
+        revealedCount: 0,
+        totalBlindWords: 0
     },
 
     // ===== DOM 요소 =====
@@ -347,7 +437,6 @@ const App = {
     // ===== 초기화 =====
     init: async function() {
         this.cacheElements();
-        this.bindEvents();
         await this.fetchVerses();
     },
 
@@ -355,31 +444,15 @@ const App = {
         this.elements = {
             loadingScreen: document.getElementById('loadingScreen'),
             errorScreen: document.getElementById('errorScreen'),
-            verseScreen: document.getElementById('verseScreen'),
-            quizScreen: document.getElementById('quizScreen'),
-            verseContainer: document.getElementById('verseContainer'),
-            verseImg: document.getElementById('verseImg'),
-            verseText: document.getElementById('verseText'),
-            verseRef: document.getElementById('verseRef'),
+            contentWrapper: document.getElementById('contentWrapper'),
+            versesContainer: document.getElementById('versesContainer'),
+            quizSection: document.getElementById('quizSection'),
             quizText: document.getElementById('quizText'),
             quizRef: document.getElementById('quizRef'),
-            nextBtn: document.getElementById('nextBtn'),
             completionMsg: document.getElementById('completionMsg'),
-            dots: document.querySelectorAll('.dot')
+            revealedCount: document.getElementById('revealedCount'),
+            totalCount: document.getElementById('totalCount')
         };
-    },
-
-    bindEvents: function() {
-        this.elements.nextBtn.addEventListener('click', () => this.next());
-
-        // 키보드 네비게이션
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                if (this.state.currentIndex < 3) {
-                    this.next();
-                }
-            }
-        });
     },
 
     // ===== API 호출 =====
@@ -393,11 +466,11 @@ const App = {
             const data = await response.json();
             this.state.verses = data.verses;
             this.state.quizVerse = data.verses[Math.floor(Math.random() * 3)];
-            this.state.currentIndex = 0;
-            this.state.revealedWords = new Set();
+            this.state.revealedCount = 0;
 
-            this.showScreen('verse');
-            this.renderVerse(0);
+            this.renderVerses();
+            this.renderQuiz();
+            this.showScreen('content');
         } catch (error) {
             console.error('구절 로드 실패:', error);
             this.showScreen('error');
@@ -406,114 +479,86 @@ const App = {
 
     // ===== 화면 전환 =====
     showScreen: function(screen) {
-        this.elements.loadingScreen.style.display = 'none';
-        this.elements.errorScreen.style.display = 'none';
-        this.elements.verseScreen.style.display = 'none';
-        this.elements.quizScreen.style.display = 'none';
+        this.elements.loadingScreen.classList.add('hidden');
+        this.elements.errorScreen.classList.add('hidden');
+        this.elements.contentWrapper.classList.add('hidden');
 
         switch(screen) {
             case 'loading':
-                this.elements.loadingScreen.style.display = 'block';
+                this.elements.loadingScreen.classList.remove('hidden');
                 break;
             case 'error':
-                this.elements.errorScreen.style.display = 'block';
+                this.elements.errorScreen.classList.remove('hidden');
                 break;
-            case 'verse':
-                this.elements.verseScreen.style.display = 'block';
-                break;
-            case 'quiz':
-                this.elements.quizScreen.style.display = 'block';
+            case 'content':
+                this.elements.contentWrapper.classList.remove('hidden');
                 break;
         }
     },
 
     // ===== 구절 렌더링 =====
-    renderVerse: function(index) {
-        const verse = this.state.verses[index];
+    renderVerses: function() {
+        this.elements.versesContainer.innerHTML = '';
 
-        this.elements.verseImg.src = `/static/images/bible/${verse.image}`;
-        this.elements.verseText.textContent = verse.text;
-        this.elements.verseRef.textContent =
-            `${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}`;
-
-        this.updateDots(index);
-        this.elements.nextBtn.textContent = index < 2 ? '다음' : '퀴즈 시작';
-    },
-
-    updateDots: function(currentIndex) {
-        this.elements.dots.forEach((dot, i) => {
-            dot.classList.remove('active', 'completed');
-            if (i === currentIndex) {
-                dot.classList.add('active');
-            } else if (i < currentIndex) {
-                dot.classList.add('completed');
-            }
+        this.state.verses.forEach((verse, index) => {
+            const card = document.createElement('div');
+            card.className = 'verse-card';
+            card.innerHTML = `
+                <div class="verse-image">
+                    <img src="/static/images/bible/${verse.image}"
+                         alt="${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}"
+                         onerror="this.src='/static/images/bible/placeholder.webp'">
+                </div>
+                <div class="verse-content">
+                    <div class="verse-number">${index + 1}</div>
+                    <p class="verse-text">${verse.text}</p>
+                    <p class="verse-reference">
+                        ${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}
+                    </p>
+                </div>
+            `;
+            this.elements.versesContainer.appendChild(card);
         });
     },
 
-    // ===== 다음 버튼 =====
-    next: function() {
-        if (this.state.isTransitioning) return;
-
-        if (this.state.currentIndex < 2) {
-            this.transitionToNext();
-        } else {
-            this.showQuiz();
-        }
-    },
-
-    transitionToNext: function() {
-        this.state.isTransitioning = true;
-        this.elements.nextBtn.disabled = true;
-
-        // 페이드 아웃
-        this.elements.verseContainer.classList.add('fade-out');
-
-        setTimeout(() => {
-            this.state.currentIndex++;
-            this.renderVerse(this.state.currentIndex);
-
-            // 페이드 인
-            this.elements.verseContainer.classList.remove('fade-out');
-
-            setTimeout(() => {
-                this.state.isTransitioning = false;
-                this.elements.nextBtn.disabled = false;
-            }, 300);
-        }, 300);
-    },
-
-    // ===== 퀴즈 =====
-    showQuiz: function() {
-        this.showScreen('quiz');
-        this.updateDots(3);
-        this.renderQuiz();
-    },
-
+    // ===== 퀴즈 렌더링 =====
     renderQuiz: function() {
         const verse = this.state.quizVerse;
         let text = verse.text;
         const blindWords = verse.blind_words || [];
 
-        // 블라인드 단어를 span으로 치환 (긴 단어부터 처리하여 부분 매칭 방지)
+        // 블라인드 단어를 플레이스홀더로 치환 (긴 단어부터 처리하여 부분 매칭 방지)
         const sortedWords = [...blindWords].sort((a, b) => b.length - a.length);
+        const replacements = [];
 
-        sortedWords.forEach((word, originalIndex) => {
-            const actualIndex = blindWords.indexOf(word);
-            const placeholder = `__BLIND_${actualIndex}__`;
-            text = text.replace(new RegExp(this.escapeRegex(word), 'g'), placeholder);
+        sortedWords.forEach((word) => {
+            const regex = new RegExp(this.escapeRegex(word), 'g');
+            const matches = text.match(regex);
+
+            if (matches) {
+                matches.forEach((match, matchIndex) => {
+                    const uniqueId = `${blindWords.indexOf(word)}_${matchIndex}`;
+                    const placeholder = `__BLIND_${uniqueId}__`;
+                    text = text.replace(match, placeholder);
+                    replacements.push({ placeholder, word, uniqueId });
+                });
+            }
         });
 
         // 플레이스홀더를 실제 span으로 변환
-        blindWords.forEach((word, index) => {
-            const placeholder = `__BLIND_${index}__`;
-            const span = `<span class="blind-word" data-index="${index}" data-word="${word}" onclick="App.revealWord(${index})">____</span>`;
-            text = text.replace(new RegExp(placeholder, 'g'), span);
+        replacements.forEach(({ placeholder, word, uniqueId }) => {
+            const span = `<span class="blind-word" data-id="${uniqueId}" data-word="${word}" onclick="App.revealWord('${uniqueId}')">${word}</span>`;
+            text = text.replace(placeholder, span);
         });
 
         this.elements.quizText.innerHTML = text;
         this.elements.quizRef.textContent =
             `${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}`;
+
+        // 전체 블라인드 단어 수 설정
+        this.state.totalBlindWords = replacements.length;
+        this.elements.totalCount.textContent = this.state.totalBlindWords;
+        this.elements.revealedCount.textContent = '0';
         this.elements.completionMsg.classList.remove('show');
     },
 
@@ -521,27 +566,32 @@ const App = {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     },
 
-    revealWord: function(index) {
-        const span = document.querySelector(`.blind-word[data-index="${index}"]`);
+    // ===== 단어 공개 =====
+    revealWord: function(uniqueId) {
+        const span = document.querySelector(`.blind-word[data-id="${uniqueId}"]`);
         if (!span || span.classList.contains('revealed')) return;
 
-        const word = span.dataset.word;
-        span.textContent = word;
         span.classList.add('revealed');
-        this.state.revealedWords.add(index);
+        this.state.revealedCount++;
+        this.elements.revealedCount.textContent = this.state.revealedCount;
 
         // 모든 단어 공개 확인
-        const totalWords = this.state.quizVerse.blind_words.length;
-        if (this.state.revealedWords.size === totalWords) {
-            this.elements.completionMsg.classList.add('show');
+        if (this.state.revealedCount === this.state.totalBlindWords) {
+            setTimeout(() => {
+                this.elements.completionMsg.classList.add('show');
+                // 퀴즈 섹션으로 스크롤
+                this.elements.quizSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
         }
     },
 
     // ===== 재시작 =====
     restart: function() {
-        this.state.currentIndex = 0;
-        this.state.revealedWords = new Set();
-        this.fetchVerses();
+        this.state.revealedCount = 0;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => {
+            this.fetchVerses();
+        }, 500);
     }
 };
 
