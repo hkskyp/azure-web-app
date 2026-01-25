@@ -63,11 +63,8 @@ pip install diffusers transformers accelerate Pillow
 # 3. GPU 확인
 python scripts/check_gpu.py
 
-# 4. 이미지 생성
+# 4. 이미지 생성 (자동으로 WebP로 저장)
 python scripts/generate_images_diffusers.py
-
-# 5. WebP 변환
-python scripts/convert_to_webp.py
 ```
 
 ### Image Specifications
@@ -79,10 +76,10 @@ python scripts/convert_to_webp.py
 - **Naming**: `{book}_{chapter}_{verse}.webp` (e.g., `psalm_23_1.webp`)
 
 ### Scripts
-- `scripts/generate_bible_images.py` - 50개 프롬프트 생성
-- `scripts/generate_images_diffusers.py` - Stable Diffusion 로컬 생성
-- `scripts/convert_to_webp.py` - PNG/JPG → WebP 변환
+- `scripts/prompts.py` - YAML 프롬프트 로더
+- `scripts/generate_images_diffusers.py` - Stable Diffusion 이미지 생성 (WebP 자동 변환)
 - `scripts/check_gpu.py` - GPU/CUDA 진단
+- `scripts/create_placeholder.py` - Placeholder 이미지 생성
 
 ## 배포
 `master` 브랜치 푸시 시 Azure Web App으로 자동 배포

@@ -59,11 +59,11 @@ def generate_all_images():
     os.makedirs(output_dir, exist_ok=True)
     print(f"[INFO] 저장 경로: {output_dir}\n")
 
-    # 모델 로드 (SDXL 사용)
-    print("[INFO] Stable Diffusion XL 모델 로딩 중... (첫 실행 시 약 7GB 다운로드)")
+    # 모델 로드 (SDXL Turbo - 빠른 생성)
+    print("[INFO] Stable Diffusion XL Turbo 모델 로딩 중... (첫 실행 시 약 7GB 다운로드)")
 
     pipe = StableDiffusionXLPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-xl-base-1.0",
+        "stabilityai/sdxl-turbo",
         torch_dtype=torch.float16 if device == "cuda" else torch.float32,
         use_safetensors=True,
         variant="fp16" if device == "cuda" else None
@@ -82,19 +82,35 @@ def generate_all_images():
 
     for idx, item in enumerate(tqdm(prompts, desc="이미지 생성 중")):
         try:
-            # 이미지 생성
+            # 이미지 생성 (SDXL Turbo - guidance_scale=0.0)
             image = pipe(
                 prompt=item['prompt'],
-                negative_prompt=item['negative'],
                 num_inference_steps=item['steps'],
-                guidance_scale=item['guidance_scale'],
+                guidance_scale=0.0,
                 width=item['width'],
                 height=item['height']
             ).images[0]
 
-            # 저장
-            output_path = os.path.join(output_dir, item['filename'])
-            image.save(output_path)
+            # 1. RGB 변환 먼저 수행 (알파 채널 제거)
+            if image.mode in ('RGBA', 'LA', 'P'):
+                background = Image.new('RGB', image.size, (255, 255, 255))
+                if image.mode == 'P':
+                    image = image.convert('RGBA')
+                background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+                image = background
+
+            # 2. PNG로 저장 (Diffusers 출력)
+            png_filename = os.path.splitext(item['filename'])[0] + '.png'
+            png_path = os.path.join(output_dir, png_filename)
+            image.save(png_path, 'PNG')
+
+            # 3. PNG를 WebP로 변환 (with 문으로 파일 핸들 자동 관리)
+            webp_path = os.path.join(output_dir, item['filename'])
+            with Image.open(png_path) as png_img:
+                png_img.save(webp_path, 'WEBP', quality=85, method=6)
+
+            # 4. PNG 파일 삭제 (WebP만 유지)
+            os.remove(png_path)
 
             success_count += 1
 
@@ -115,8 +131,7 @@ def generate_all_images():
             print(f"  - {filename}")
 
     print(f"\n[INFO] 저장 경로: {output_dir}")
-    print(f"\n다음 단계: WebP 변환")
-    print("python scripts/convert_to_webp.py")
+    print("\n이미지가 WebP 형식으로 저장되었습니다.")
 
 if __name__ == "__main__":
     generate_all_images()

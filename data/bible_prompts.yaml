@@ -5,280 +5,280 @@ common:
   watercolor_style: "watercolor painting style, soft brush strokes, gentle pastel colors, hand painted, artistic illustration, biblical art"
   negative_prompt: "photograph, 3d render, digital art, realistic, photorealistic, ugly, distorted, modern, dark, violent"
 
-  # 이미지 생성 설정 (SDXL 최적화)
+  # 이미지 생성 설정 (SDXL Turbo - 초고속)
   settings:
-    width: 1024
-    height: 576
-    steps: 30
-    guidance_scale: 7.5
+    width: 768
+    height: 432
+    steps: 4
+    guidance_scale: 0.0
 
 # 현재 샘플: 50개 구절 (향후 전체 성경으로 확장 예정)
 verses:
   # 시편 (Psalms)
-  - filename: psalm_23_1.png
+  - filename: psalm_23_1.webp
     verse: "시편 23:1"
     prompt: "peaceful shepherd guiding white sheep through lush green pastures, golden sunlight, soft clouds, serene landscape"
     negative_extra: ""
 
-  - filename: psalm_23_4.png
+  - filename: psalm_23_4.webp
     verse: "시편 23:4"
     prompt: "narrow valley path between mountains, divine light breaking through clouds, ray of hope, spiritual atmosphere"
     negative_extra: ", scary, horror"
 
-  - filename: psalm_119_105.png
+  - filename: psalm_119_105.webp
     verse: "시편 119:105"
     prompt: "ancient oil lamp with warm glow, illuminating path, holy bible, peaceful night"
     negative_extra: ""
 
-  - filename: psalm_119_9.png
+  - filename: psalm_119_9.webp
     verse: "시편 119:9"
     prompt: "young person reading scriptures in morning light, pure atmosphere, clean simplicity"
     negative_extra: ""
 
-  - filename: psalm_27_1.png
+  - filename: psalm_27_1.webp
     verse: "시편 27:1"
     prompt: "divine light shining from heaven, person in holy radiance, warm golden rays, spiritual scene"
     negative_extra: ""
 
-  - filename: psalm_103_2.png
+  - filename: psalm_103_2.webp
     verse: "시편 103:2"
     prompt: "soul in praise, divine blessings as golden light, spiritual gratitude, beautiful clouds"
     negative_extra: ""
 
-  - filename: psalm_121_5.png
+  - filename: psalm_121_5.webp
     verse: "시편 121:5"
     prompt: "protective divine shade, peaceful rest, gentle light, comforting scene"
     negative_extra: ""
 
-  - filename: psalm_133_1.png
+  - filename: psalm_133_1.webp
     verse: "시편 133:1"
     prompt: "people in unity, harmony, warm community, peaceful fellowship, golden hour"
     negative_extra: ", conflict"
 
   # 요한복음 (John)
-  - filename: john_3_16.png
+  - filename: john_3_16.webp
     verse: "요한복음 3:16"
     prompt: "divine love from heaven to earth, brilliant rays, cross silhouette, eternal life symbol, majestic clouds"
     negative_extra: ""
 
-  - filename: john_13_34.png
+  - filename: john_13_34.webp
     verse: "요한복음 13:34"
     prompt: "two hearts connected, warm golden light, spiritual bond, Christian love, soft colors"
     negative_extra: ""
 
-  - filename: john_15_7.png
+  - filename: john_15_7.webp
     verse: "요한복음 15:7"
     prompt: "vine branches with fruit, spiritual growth, lush garden, divine connection, natural beauty"
     negative_extra: ", dead, dry"
 
-  - filename: john_6_40.png
+  - filename: john_6_40.webp
     verse: "요한복음 6:40"
     prompt: "person looking upward, radiant divine light, eternal life, spiritual belief, peaceful faith"
     negative_extra: ""
 
-  - filename: john_11_25.png
+  - filename: john_11_25.webp
     verse: "요한복음 11:25"
     prompt: "resurrection light breaking darkness, life emerging, spiritual rebirth, holy radiance, hope"
     negative_extra: ""
 
-  - filename: john_14_13.png
+  - filename: john_14_13.webp
     verse: "요한복음 14:13"
     prompt: "praying hands toward heaven, divine glory, answered prayer, golden light rays, majestic clouds"
     negative_extra: ""
 
   # 마태복음 (Matthew)
-  - filename: matthew_11_28.png
+  - filename: matthew_11_28.webp
     verse: "마태복음 11:28"
     prompt: "person releasing burden, peaceful rest, gentle comfort, spiritual relief, soft warm light"
     negative_extra: ", stress, chaos"
 
-  - filename: matthew_6_33.png
+  - filename: matthew_6_33.webp
     verse: "마태복음 6:33"
     prompt: "kingdom of heaven gates, divine light, righteous path upward, majestic architecture"
     negative_extra: ""
 
-  - filename: matthew_5_9.png
+  - filename: matthew_5_9.webp
     verse: "마태복음 5:9"
     prompt: "peacemaker bringing harmony, divine blessing, reconciliation, peaceful resolution, soft light"
     negative_extra: ", war, conflict"
 
-  - filename: matthew_6_9.png
+  - filename: matthew_6_9.webp
     verse: "마태복음 6:9"
     prompt: "heavenly father in majestic light, divine kingdom, sacred prayer, golden clouds, spiritual reverence"
     negative_extra: ""
 
   # 로마서 (Romans)
-  - filename: romans_10_17.png
+  - filename: romans_10_17.webp
     verse: "로마서 10:17"
     prompt: "ears hearing divine word, sound waves of scripture, light from bible, faith growing"
     negative_extra: ""
 
-  - filename: romans_5_1.png
+  - filename: romans_5_1.webp
     verse: "로마서 5:1"
     prompt: "peace with God, divine harmony, spiritual reconciliation, warm holy light"
     negative_extra: ", judgment, guilt"
 
-  - filename: romans_12_1.png
+  - filename: romans_12_1.webp
     verse: "로마서 12:1"
     prompt: "living sacrifice on altar, spiritual dedication, gentle fire, sacred offering"
     negative_extra: ""
 
   # 빌립보서 (Philippians)
-  - filename: philippians_4_13.png
+  - filename: philippians_4_13.webp
     verse: "빌립보서 4:13"
     prompt: "person empowered with divine strength, glowing, overcoming obstacles, spiritual victory"
     negative_extra: ", weakness, defeat"
 
-  - filename: philippians_2_5.png
+  - filename: philippians_2_5.webp
     verse: "빌립보서 2:5"
     prompt: "Christ's humble mind, gentle light, servant heart, divine humility, peaceful wisdom"
     negative_extra: ", pride, arrogance"
 
   # 이사야 (Isaiah)
-  - filename: isaiah_41_10.png
+  - filename: isaiah_41_10.webp
     verse: "이사야 41:10"
     prompt: "God's presence beside person, divine companionship, fear dissolving, spiritual courage, comfort"
     negative_extra: ", fear, alone"
 
-  - filename: isaiah_53_5.png
+  - filename: isaiah_53_5.webp
     verse: "이사야 53:5"
     prompt: "sacrifice for redemption, spiritual healing, solemn holy scene, deep meaning, gentle colors"
     negative_extra: ", violence, cruelty"
 
   # 고린도전서/후서 (Corinthians)
-  - filename: corinthians_12_9.png
+  - filename: corinthians_12_9.webp
     verse: "고린도후서 12:9"
     prompt: "divine grace flowing like golden light, strength in weakness, holy sufficiency, comforting"
     negative_extra: ", inadequacy"
 
-  - filename: corinthians_12_9_alt.png
+  - filename: corinthians_12_9_alt.webp
     verse: "고린도후서 12:9"
     prompt: "sufficient grace as overflowing vessel of light, divine abundance, spiritual completeness, warm glow"
     negative_extra: ", lack, emptiness"
 
-  - filename: corinthians1_13_7.png
+  - filename: corinthians1_13_7.webp
     verse: "고린도전서 13:7"
     prompt: "love protecting trusting hoping persevering, four pillars of light, spiritual virtues"
     negative_extra: ", hatred, doubt"
 
-  - filename: corinthians1_15_58.png
+  - filename: corinthians1_15_58.webp
     verse: "고린도전서 15:58"
     prompt: "firm foundation, standing strong in faith, steadfastness, determined service"
     negative_extra: ", wavering, falling"
 
-  - filename: corinthians2_3_17.png
+  - filename: corinthians2_3_17.webp
     verse: "고린도후서 3:17"
     prompt: "spirit bringing freedom, chains breaking, liberation, spiritual independence, joyful release"
     negative_extra: ", captivity, slavery"
 
-  - filename: corinthians_5_7.png
+  - filename: corinthians_5_7.webp
     verse: "고린도후서 5:7"
     prompt: "walking by faith not sight, spiritual path through mist, divine guidance, trusting journey"
     negative_extra: ", lost, blind"
 
   # 데살로니가전서 (Thessalonians)
-  - filename: thessalonians_5_16.png
+  - filename: thessalonians_5_16.webp
     verse: "데살로니가전서 5:16"
     prompt: "joy prayer thanksgiving, three beams of golden light, spiritual disciplines, constant worship"
     negative_extra: ", sadness, silence"
 
-  - filename: thessalonians_5_18.png
+  - filename: thessalonians_5_18.webp
     verse: "데살로니가전서 5:18"
     prompt: "gratitude in all circumstances, thanksgiving rising, divine will, spiritual contentment"
     negative_extra: ", complaining, bitterness"
 
   # 잠언 (Proverbs)
-  - filename: proverbs_3_5.png
+  - filename: proverbs_3_5.webp
     verse: "잠언 3:5"
     prompt: "heart trusting God, mind surrendering, spiritual wisdom, divine guidance, peaceful faith"
     negative_extra: ", arrogance, confusion"
 
-  - filename: proverbs_9_10.png
+  - filename: proverbs_9_10.webp
     verse: "잠언 9:10"
     prompt: "fear of Lord as foundation, holy reverence, beginning of knowledge, spiritual understanding"
     negative_extra: ", foolishness, disrespect"
 
   # 베드로전서 (1 Peter)
-  - filename: peter_5_7.png
+  - filename: peter_5_7.webp
     verse: "베드로전서 5:7"
     prompt: "casting anxiety to God, burdens lifting to heaven, divine care, spiritual relief, gentle acceptance"
     negative_extra: ", stress, overwhelming"
 
   # 디모데후서 (2 Timothy)
-  - filename: timothy_4_7.png
+  - filename: timothy_4_7.webp
     verse: "디모데후서 4:7"
     prompt: "finished race, victorious athlete, good fight completed, faith preserved, spiritual triumph"
     negative_extra: ", defeat, failure"
 
   # 욥기 (Job)
-  - filename: job_8_7.png
+  - filename: job_8_7.webp
     verse: "욥기 8:7"
     prompt: "humble beginnings growing to prosperity, small seed becoming tree, divine blessing"
     negative_extra: ", decline, shrinking"
 
   # 요한일서 (1 John)
-  - filename: john1_4_7.png
+  - filename: john1_4_7.webp
     verse: "요한일서 4:7"
     prompt: "love flowing from God to people, divine source, spiritual connection, warm hearts united"
     negative_extra: ", hatred, coldness"
 
-  - filename: john1_3_18.png
+  - filename: john1_3_18.webp
     verse: "요한일서 3:18"
     prompt: "love in action not words, hands serving, deeds of truth, spiritual authenticity, genuine care"
     negative_extra: ", hypocrisy, fake"
 
   # 갈라디아서 (Galatians)
-  - filename: galatians_6_7.png
+  - filename: galatians_6_7.webp
     verse: "갈라디아서 6:7"
     prompt: "sowing and reaping, spiritual harvest, seeds growing to fruit, natural divine law"
     negative_extra: ", chaos, randomness"
 
-  - filename: galatians_5_22.png
+  - filename: galatians_5_22.webp
     verse: "갈라디아서 5:22"
     prompt: "fruit of Spirit love joy peace patience kindness goodness, abundant harvest, colorful divine virtues"
     negative_extra: ", rotten, evil"
 
   # 골로새서 (Colossians)
-  - filename: colossians_3_17.png
+  - filename: colossians_3_17.webp
     verse: "골로새서 3:17"
     prompt: "everything in Jesus name, divine purpose, spiritual dedication, holy service, thankful work"
     negative_extra: ", selfish, purposeless"
 
   # 야고보서 (James)
-  - filename: james_5_16.png
+  - filename: james_5_16.webp
     verse: "야고보서 5:16"
     prompt: "powerful prayer of righteous, spiritual force, divine connection, holy communication to heaven"
     negative_extra: ", powerless, blocked"
 
-  - filename: james_2_17.png
+  - filename: james_2_17.webp
     verse: "야고보서 2:17"
     prompt: "faith with action alive, belief in deeds, spiritual vitality, active trust working"
     negative_extra: ", dead, inactive"
 
-  - filename: james_1_2.png
+  - filename: james_1_2.webp
     verse: "야고보서 1:2"
     prompt: "joy in trials, peaceful acceptance, spiritual growth through difficulty, divine perspective"
     negative_extra: ", despair, hopelessness"
 
   # 요한계시록 (Revelation)
-  - filename: revelation_3_20.png
+  - filename: revelation_3_20.webp
     verse: "요한계시록 3:20"
     prompt: "Jesus knocking at door, divine invitation, spiritual calling, gentle seeking, open fellowship"
     negative_extra: ", rejection, closed"
 
-  - filename: revelation_2_10.png
+  - filename: revelation_2_10.webp
     verse: "요한계시록 2:10"
     prompt: "crown of life, faithful reward, spiritual victory, eternal prize, divine honor"
     negative_extra: ", defeat, abandonment"
 
   # 아모스 (Amos)
-  - filename: amos_5_15.png
+  - filename: amos_5_15.webp
     verse: "아모스 5:15"
     prompt: "hating evil loving good, justice established, spiritual righteousness, divine order, moral clarity"
     negative_extra: ", injustice, corruption"
 
   # 느헤미야 (Nehemiah)
-  - filename: nehemiah_8_10.png
+  - filename: nehemiah_8_10.webp
     verse: "느헤미야 8:10"
     prompt: "joy of Lord as strength, spiritual power from gladness, divine energy, holy celebration"
     negative_extra: ", weakness, sadness"
