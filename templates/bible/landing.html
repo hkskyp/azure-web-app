@@ -244,12 +244,39 @@
     height: 300px;
     overflow: hidden;
     background: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
 .verse-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.verse-image.no-image {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.verse-image.no-image::before {
+    content: '준비중';
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.verse-image.no-image::after {
+    content: 'Coming Soon';
+    font-size: 1.1rem;
+    color: var(--text-gray);
+    font-weight: 500;
 }
 
 .verse-content {
@@ -547,6 +574,14 @@
         height: 200px;
     }
 
+    .verse-image.no-image::before {
+        font-size: 1.5rem;
+    }
+
+    .verse-image.no-image::after {
+        font-size: 1rem;
+    }
+
     .verse-text {
         font-size: 1.1rem;
     }
@@ -828,10 +863,10 @@ const App = {
             slide.className = 'slide';
             slide.innerHTML = `
                 <div class="verse-card">
-                    <div class="verse-image">
+                    <div class="verse-image" id="verseImage${index}">
                         <img src="/static/images/bible/${verse.image}"
                              alt="${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}"
-                             onerror="this.src='/static/images/bible/placeholder.webp'">
+                             onerror="this.style.display='none'; document.getElementById('verseImage${index}').classList.add('no-image');">
                     </div>
                     <div class="verse-content">
                         <div class="verse-number">${index + 1}</div>
