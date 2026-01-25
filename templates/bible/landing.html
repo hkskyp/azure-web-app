@@ -155,20 +155,39 @@
 
 /* ===== 컨텐츠 컨테이너 ===== */
 .content-wrapper {
-    width: 100%;
+    height: 600px;
+    position: relative;
 }
 
-/* ===== 구절 컨테이너 (세로 레이아웃) ===== */
-.verses-container {
+/* ===== 스크롤 컨테이너 (가로 스와이프) ===== */
+.scroll-container {
     display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    margin-bottom: 3rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* ===== 퀴즈 컨테이너 ===== */
-.quiz-container {
-    margin-top: 2rem;
+/* Hide scrollbar */
+.scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.scroll-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ===== Slide (Card) ===== */
+.slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
 }
 
 /* ===== 스크롤 컨테이너 ===== */
@@ -211,8 +230,8 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    max-width: 600px;
-    width: 100%;
+    max-width: 700px;
+    width: 90%;
     transition: box-shadow 0.3s ease;
 }
 
@@ -272,9 +291,9 @@
     padding: 2.5rem 2rem;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    max-width: 600px;
-    width: 100%;
-    max-height: calc(100vh - 200px);
+    max-width: 700px;
+    width: 90%;
+    max-height: 550px;
     overflow-y: auto;
 }
 
@@ -507,12 +526,21 @@
         font-size: 0.75rem;
     }
 
-    .scroll-container {
-        padding-top: 80px;
+    .content-wrapper {
+        height: 500px;
     }
 
     .slide {
         padding: 1rem;
+    }
+
+    .verse-card {
+        width: 95%;
+    }
+
+    .quiz-card {
+        width: 95%;
+        max-height: 450px;
     }
 
     .verse-image {
@@ -589,11 +617,17 @@
 
         <!-- 컨텐츠 -->
         <div id="contentWrapper" class="content-wrapper hidden">
-            <!-- 구절 카드들 -->
-            <div id="versesContainer" class="verses-container"></div>
+            <!-- 스크롤 컨테이너 (가로 스와이프) -->
+            <div id="scrollContainer" class="scroll-container">
+                <!-- 구절 슬라이드들이 여기에 동적으로 추가됨 -->
+            </div>
 
-            <!-- 퀴즈 섹션 -->
-            <div id="quizContainer" class="quiz-container"></div>
+            <!-- 네비게이션 화살표 -->
+            <div id="navLeft" class="nav-arrow left hidden" onclick="App.navigate(-1)">‹</div>
+            <div id="navRight" class="nav-arrow right" onclick="App.navigate(1)">›</div>
+
+            <!-- 네비게이션 인디케이터 -->
+            <div id="navIndicators" class="nav-indicators"></div>
         </div>
     </div>
 </div>
@@ -662,8 +696,10 @@ const App = {
             loadingScreen: document.getElementById('loadingScreen'),
             errorScreen: document.getElementById('errorScreen'),
             contentWrapper: document.getElementById('contentWrapper'),
-            versesContainer: document.getElementById('versesContainer'),
-            quizContainer: document.getElementById('quizContainer')
+            scrollContainer: document.getElementById('scrollContainer'),
+            navLeft: document.getElementById('navLeft'),
+            navRight: document.getElementById('navRight'),
+            navIndicators: document.getElementById('navIndicators')
         };
     },
 
@@ -702,6 +738,11 @@ const App = {
 
             this.renderSlides();
             this.showScreen('content');
+
+            // 화면 렌더링 후 네비게이션 설정
+            setTimeout(() => {
+                this.setupNavigation();
+            }, 100);
         } catch (error) {
             console.error('Failed to load verses:', error);
             this.showScreen('error');
@@ -779,33 +820,37 @@ const App = {
 
     // ===== 슬라이드 렌더링 =====
     renderSlides: function() {
-        this.elements.versesContainer.innerHTML = '';
-        this.elements.quizContainer.innerHTML = '';
+        this.elements.scrollContainer.innerHTML = '';
 
-        // 구절 카드 생성 (세로 레이아웃)
+        // 구절 슬라이드 생성
         this.state.verses.forEach((verse, index) => {
-            const card = document.createElement('div');
-            card.className = 'verse-card';
-            card.innerHTML = `
-                <div class="verse-image">
-                    <img src="/static/images/bible/${verse.image}"
-                         alt="${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}"
-                         onerror="this.src='/static/images/bible/placeholder.webp'">
-                </div>
-                <div class="verse-content">
-                    <div class="verse-number">${index + 1}</div>
-                    <p class="verse-text">${verse.text}</p>
-                    <p class="verse-reference">
-                        ${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}
-                    </p>
+            const slide = document.createElement('div');
+            slide.className = 'slide';
+            slide.innerHTML = `
+                <div class="verse-card">
+                    <div class="verse-image">
+                        <img src="/static/images/bible/${verse.image}"
+                             alt="${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}"
+                             onerror="this.src='/static/images/bible/placeholder.webp'">
+                    </div>
+                    <div class="verse-content">
+                        <div class="verse-number">${index + 1}</div>
+                        <p class="verse-text">${verse.text}</p>
+                        <p class="verse-reference">
+                            ${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}
+                        </p>
+                    </div>
                 </div>
             `;
-            this.elements.versesContainer.appendChild(card);
+            this.elements.scrollContainer.appendChild(slide);
         });
 
-        // 퀴즈 섹션 생성
+        // 퀴즈 슬라이드 생성
+        const quizSlide = document.createElement('div');
+        quizSlide.className = 'slide';
         const texts = TEXTS[CURRENT_LANG];
-        this.elements.quizContainer.innerHTML = `
+
+        quizSlide.innerHTML = `
             <div class="quiz-card">
                 <h2 class="quiz-title">${texts.quizTitle}</h2>
                 <p class="quiz-subtitle">${texts.quizSubtitle}</p>
@@ -830,6 +875,7 @@ const App = {
                 <button class="restart-btn" onclick="App.restart()">${texts.restartBtn}</button>
             </div>
         `;
+        this.elements.scrollContainer.appendChild(quizSlide);
 
         // 퀴즈 렌더링
         this.renderQuiz();
@@ -921,6 +967,62 @@ const App = {
         this.elements.navRight.classList.toggle('hidden', currentSlide === this.state.totalSlides - 1);
     },
 
+    // ===== 네비게이트 =====
+    navigate: function(direction) {
+        const newSlide = this.state.currentSlide + direction;
+        if (newSlide >= 0 && newSlide < this.state.totalSlides) {
+            this.scrollToSlide(newSlide);
+        }
+    },
+
+    scrollToSlide: function(index) {
+        const container = this.elements.scrollContainer;
+        const slideWidth = container.clientWidth;
+        container.scrollTo({
+            left: slideWidth * index,
+            behavior: 'smooth'
+        });
+    },
+
+    // ===== 네비게이션 설정 =====
+    setupNavigation: function() {
+        // 인디케이터 생성
+        this.elements.navIndicators.innerHTML = '';
+        for (let i = 0; i < this.state.totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = `nav-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => this.scrollToSlide(i);
+            this.elements.navIndicators.appendChild(dot);
+        }
+
+        // 스크롤 이벤트 리스너
+        this.elements.scrollContainer.addEventListener('scroll', () => {
+            this.updateNavigation();
+        });
+
+        this.updateNavigation();
+    },
+
+    // ===== 네비게이션 업데이트 =====
+    updateNavigation: function() {
+        const container = this.elements.scrollContainer;
+        const slideWidth = container.clientWidth;
+        const scrollLeft = container.scrollLeft;
+        const currentSlide = Math.round(scrollLeft / slideWidth);
+
+        this.state.currentSlide = currentSlide;
+
+        // 인디케이터 업데이트
+        const dots = this.elements.navIndicators.querySelectorAll('.nav-dot');
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+        });
+
+        // 화살표 표시/숨김
+        this.elements.navLeft.classList.toggle('hidden', currentSlide === 0);
+        this.elements.navRight.classList.toggle('hidden', currentSlide === this.state.totalSlides - 1);
+    },
+
     // ===== 네비게이션 =====
     navigate: function(direction) {
         const newSlide = this.state.currentSlide + direction;
@@ -961,7 +1063,11 @@ const App = {
     // ===== 재시작 =====
     restart: function() {
         this.state.revealedCount = 0;
-        this.fetchVerses();
+        this.state.currentSlide = 0;
+        this.scrollToSlide(0);
+        setTimeout(() => {
+            this.fetchVerses();
+        }, 500);
     }
 };
 
