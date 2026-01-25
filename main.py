@@ -2,11 +2,12 @@ from datetime import datetime
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.responses import PlainTextResponse
 from starlette.middleware.gzip import GZipMiddleware
 from coordinate_converter import CoordinateConverter
 from data.certificates import CERTIFICATES
+from data.bible_verses import BIBLE_VERSES
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -85,6 +86,21 @@ async def wes_page(request: Request):
         "products/wes.html",
         {"request": request, "current_page": "wes"}
     )
+
+@app.get("/bible-landing", response_class=HTMLResponse)
+async def bible_landing_page(request: Request):
+    """성경 구절 랜딩 페이지"""
+    return templates.TemplateResponse(
+        "bible/landing.html",
+        {"request": request, "current_page": "bible-landing"}
+    )
+
+@app.get("/api/bible-verses/random")
+async def get_random_bible_verses(count: int = 3):
+    """랜덤 성경 구절 API"""
+    import random
+    selected = random.sample(BIBLE_VERSES, min(count, len(BIBLE_VERSES)))
+    return JSONResponse(content={"verses": selected})
 
 @app.get("/developers/float-bits", response_class=HTMLResponse)
 async def float_bits_page(request: Request):
