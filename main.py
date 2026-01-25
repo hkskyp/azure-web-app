@@ -8,6 +8,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from coordinate_converter import CoordinateConverter
 from data.certificates import CERTIFICATES
 from data.bible_verses import BIBLE_VERSES
+from data.bible_verses_en import BIBLE_VERSES_EN
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -89,17 +90,42 @@ async def wes_page(request: Request):
 
 @app.get("/bible-landing", response_class=HTMLResponse)
 async def bible_landing_page(request: Request):
-    """성경 구절 랜딩 페이지"""
+    """성경 구절 랜딩 페이지 (한국어)"""
     return templates.TemplateResponse(
         "bible/landing.html",
-        {"request": request, "current_page": "bible-landing"}
+        {
+            "request": request,
+            "current_page": "bible-landing",
+            "lang": "ko",
+            "all_verses": BIBLE_VERSES  # SEO용 전체 구절
+        }
+    )
+
+@app.get("/bible-landing/en", response_class=HTMLResponse)
+async def bible_landing_page_en(request: Request):
+    """Bible Verse Landing Page (English)"""
+    return templates.TemplateResponse(
+        "bible/landing_en.html",
+        {
+            "request": request,
+            "current_page": "bible-landing",
+            "lang": "en",
+            "all_verses": BIBLE_VERSES_EN  # SEO용 전체 구절
+        }
     )
 
 @app.get("/api/bible-verses/random")
 async def get_random_bible_verses(count: int = 3):
-    """랜덤 성경 구절 API"""
+    """랜덤 성경 구절 API (한국어)"""
     import random
     selected = random.sample(BIBLE_VERSES, min(count, len(BIBLE_VERSES)))
+    return JSONResponse(content={"verses": selected})
+
+@app.get("/api/bible-verses/random/en")
+async def get_random_bible_verses_en(count: int = 3):
+    """Random Bible Verses API (English)"""
+    import random
+    selected = random.sample(BIBLE_VERSES_EN, min(count, len(BIBLE_VERSES_EN)))
     return JSONResponse(content={"verses": selected})
 
 @app.get("/developers/float-bits", response_class=HTMLResponse)

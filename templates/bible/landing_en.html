@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}오늘의 말씀 | 매일 성경 구절{% endblock %}
+{% block title %}Daily Bible Verses | Inspiring Scripture | Free Online Bible Quotes{% endblock %}
 
 {% block head %}
-<meta name="description" content="매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요. 시편, 요한복음, 마태복음 등 감동적인 성경 말씀을 무료로 제공합니다. 하나님의 말씀으로 하루를 시작하세요.">
-<meta name="keywords" content="오늘의 말씀, 성경 구절, 성경 퀴즈, 성경 암송, 시편, 요한복음, 마태복음, 기독교, 하나님 말씀, 무료 성경">
-<meta property="og:title" content="오늘의 말씀 | 매일 성경 구절">
-<meta property="og:description" content="매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요. 무료 성경 말씀으로 하루를 시작하세요.">
+<meta name="description" content="Read inspiring daily Bible verses and test your memory with interactive Bible quizzes. Free online Bible quotes from Psalms, John, Matthew, and more. Start your day with God's Word.">
+<meta name="keywords" content="daily bible verses, bible quotes, scripture, bible quiz, inspirational quotes, psalm, john, matthew, christian faith, god's word, free bible">
+<meta property="og:title" content="Daily Bible Verses | Free Inspiring Scripture">
+<meta property="og:description" content="Read inspiring daily Bible verses and test your memory with interactive quizzes. Free online Bible quotes to start your day.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://lucasoft.ai.kr/bible-landing">
-<link rel="canonical" href="https://lucasoft.ai.kr/bible-landing">
+<meta property="og:url" content="https://lucasoft.ai.kr/bible-landing/en">
+<link rel="canonical" href="https://lucasoft.ai.kr/bible-landing/en">
 <link rel="alternate" hreflang="ko" href="https://lucasoft.ai.kr/bible-landing">
 <link rel="alternate" hreflang="en" href="https://lucasoft.ai.kr/bible-landing/en">
 <link rel="alternate" hreflang="x-default" href="https://lucasoft.ai.kr/bible-landing/en">
 
-<!-- 구조화된 데이터 (Schema.org) - SEO 최적화: 전체 구절 크롤링 -->
+<!-- Structured Data (Schema.org) - SEO Optimization: All verses for crawlers -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "오늘의 말씀 | 매일 성경 구절",
-  "description": "매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요",
-  "url": "https://lucasoft.ai.kr/bible-landing",
-  "inLanguage": "ko",
+  "name": "Daily Bible Verses | Inspiring Scripture",
+  "description": "Read inspiring daily Bible verses and test your memory with interactive quizzes",
+  "url": "https://lucasoft.ai.kr/bible-landing/en",
+  "inLanguage": "en",
   "hasPart": [
     {% for verse in all_verses %}
     {
@@ -31,7 +31,7 @@
       "text": "{{ verse.text }}",
       "author": {
         "@type": "Organization",
-        "name": "성경"
+        "name": "The Bible"
       }
     }{% if not loop.last %},{% endif %}
     {% endfor %}
@@ -42,14 +42,14 @@
 
 {% block extra_css %}
 <style>
-/* ===== 앱 컨테이너 ===== */
+/* ===== App Container ===== */
 .bible-app {
     min-height: calc(100vh - var(--header-height));
     background-color: var(--bg-white);
     overflow: hidden;
 }
 
-/* ===== 로딩 화면 ===== */
+/* ===== Loading Screen ===== */
 .loading-screen {
     min-height: calc(100vh - 140px);
     display: flex;
@@ -74,7 +74,7 @@
     to { transform: rotate(360deg); }
 }
 
-/* ===== 에러 화면 ===== */
+/* ===== Error Screen ===== */
 .error-screen {
     min-height: calc(100vh - 140px);
     display: flex;
@@ -109,13 +109,13 @@
     box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
 }
 
-/* ===== 컨텐츠 컨테이너 ===== */
+/* ===== Content Container ===== */
 .content-wrapper {
     height: calc(100vh - var(--header-height));
     position: relative;
 }
 
-/* ===== 헤더 ===== */
+/* ===== Header ===== */
 .page-header {
     text-align: center;
     color: var(--text-dark);
@@ -140,7 +140,7 @@
     color: var(--text-gray);
 }
 
-/* ===== 언어 전환 버튼 ===== */
+/* ===== Language Switcher ===== */
 .lang-switcher {
     position: absolute;
     top: 1rem;
@@ -171,7 +171,7 @@
     border-color: var(--primary-color);
 }
 
-/* ===== 스크롤 컨테이너 ===== */
+/* ===== Scroll Container ===== */
 .scroll-container {
     display: flex;
     overflow-x: auto;
@@ -183,7 +183,7 @@
     -webkit-overflow-scrolling: touch;
 }
 
-/* 스크롤바 숨기기 (선택사항) */
+/* Hide scrollbar */
 .scroll-container::-webkit-scrollbar {
     display: none;
 }
@@ -193,7 +193,7 @@
     scrollbar-width: none;
 }
 
-/* ===== 슬라이드 (카드) ===== */
+/* ===== Slide (Card) ===== */
 .slide {
     flex: 0 0 100%;
     scroll-snap-align: center;
@@ -203,7 +203,7 @@
     padding: 2rem;
 }
 
-/* ===== 구절 카드 ===== */
+/* ===== Verse Card ===== */
 .verse-card {
     background: var(--bg-white);
     border: 1px solid var(--border-color);
@@ -263,7 +263,7 @@
     font-weight: 600;
 }
 
-/* ===== 퀴즈 카드 ===== */
+/* ===== Quiz Card ===== */
 .quiz-card {
     background: var(--bg-white);
     border: 1px solid var(--border-color);
@@ -305,7 +305,7 @@
     font-weight: 600;
 }
 
-/* ===== 블라인드 단어 ===== */
+/* ===== Blind Word ===== */
 .blind-word {
     display: inline-block;
     background: #e0e0e0;
@@ -352,7 +352,7 @@
     100% { transform: scale(1); }
 }
 
-/* ===== 통계 정보 ===== */
+/* ===== Quiz Stats ===== */
 .quiz-stats {
     display: flex;
     justify-content: center;
@@ -379,7 +379,7 @@
     margin-top: 0.25rem;
 }
 
-/* ===== 완료 메시지 ===== */
+/* ===== Completion Message ===== */
 .completion-msg {
     display: none;
     color: #4caf50;
@@ -401,7 +401,7 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== 버튼 ===== */
+/* ===== Button ===== */
 .restart-btn {
     background: var(--primary-color);
     color: white;
@@ -421,7 +421,7 @@
     box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
 }
 
-/* ===== 네비게이션 인디케이터 ===== */
+/* ===== Navigation Indicators ===== */
 .nav-indicators {
     position: fixed;
     bottom: 2rem;
@@ -454,7 +454,7 @@
     background: var(--primary-hover);
 }
 
-/* ===== 네비게이션 화살표 ===== */
+/* ===== Navigation Arrows ===== */
 .nav-arrow {
     position: fixed;
     top: 50%;
@@ -493,7 +493,7 @@
     pointer-events: none;
 }
 
-/* ===== 반응형 ===== */
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
     .page-header h1 {
         font-size: 1.5rem;
@@ -550,7 +550,7 @@
         gap: 0.5rem;
     }
 
-    /* 모바일에서 화살표 숨김 (스와이프만 사용) */
+    /* Hide arrows on mobile (swipe only) */
     .nav-arrow {
         display: none !important;
     }
@@ -561,7 +561,7 @@
     }
 }
 
-/* ===== 숨김 처리 ===== */
+/* ===== Hidden ===== */
 .hidden {
     display: none !important;
 }
@@ -570,43 +570,43 @@
 
 {% block content %}
 <div id="bibleApp" class="bible-app">
-    <!-- 로딩 화면 -->
+    <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
         <div class="spinner"></div>
-        <p>말씀을 준비하고 있습니다...</p>
+        <p>Preparing the Word...</p>
     </div>
 
-    <!-- 에러 화면 -->
+    <!-- Error Screen -->
     <div id="errorScreen" class="error-screen hidden">
         <div class="error-icon">😔</div>
-        <p>말씀을 불러오는데 실패했습니다.</p>
-        <button class="retry-btn" onclick="App.init()">다시 시도</button>
+        <p>Failed to load verses.</p>
+        <button class="retry-btn" onclick="App.init()">Retry</button>
     </div>
 
-    <!-- 컨텐츠 -->
+    <!-- Content -->
     <div id="contentWrapper" class="content-wrapper hidden">
-        <!-- 언어 전환 버튼 -->
+        <!-- Language Switcher -->
         <div class="lang-switcher">
-            <a href="/bible-landing" class="lang-btn active">한국어</a>
-            <a href="/bible-landing/en" class="lang-btn">English</a>
+            <a href="/bible-landing" class="lang-btn">한국어</a>
+            <a href="/bible-landing/en" class="lang-btn active">English</a>
         </div>
 
-        <!-- 헤더 -->
+        <!-- Header -->
         <div class="page-header">
-            <h1>오늘의 말씀</h1>
-            <p>하나님의 말씀으로 하루를 시작하세요</p>
+            <h1>Daily Bible Verses</h1>
+            <p>Start your day with God's Word</p>
         </div>
 
-        <!-- 스크롤 컨테이너 -->
+        <!-- Scroll Container -->
         <div id="scrollContainer" class="scroll-container">
-            <!-- 구절 슬라이드들이 여기에 동적으로 추가됨 -->
+            <!-- Slides will be dynamically added here -->
         </div>
 
-        <!-- 네비게이션 화살표 -->
+        <!-- Navigation Arrows -->
         <div id="navLeft" class="nav-arrow left hidden" onclick="App.navigate(-1)">‹</div>
         <div id="navRight" class="nav-arrow right" onclick="App.navigate(1)">›</div>
 
-        <!-- 네비게이션 인디케이터 -->
+        <!-- Navigation Indicators -->
         <div id="navIndicators" class="nav-indicators"></div>
     </div>
 </div>
@@ -615,7 +615,7 @@
 {% block extra_js %}
 <script>
 const App = {
-    // ===== 상태 관리 =====
+    // ===== State Management =====
     state: {
         verses: [],
         quizVerse: null,
@@ -625,10 +625,10 @@ const App = {
         totalSlides: 4
     },
 
-    // ===== DOM 요소 =====
+    // ===== DOM Elements =====
     elements: {},
 
-    // ===== 초기화 =====
+    // ===== Initialize =====
     init: async function() {
         this.cacheElements();
         await this.fetchVerses();
@@ -646,18 +646,18 @@ const App = {
         };
     },
 
-    // ===== API 호출 =====
+    // ===== API Call =====
     fetchVerses: async function() {
         this.showScreen('loading');
 
         try {
-            const response = await fetch('/api/bible-verses/random?count=3');
-            if (!response.ok) throw new Error('API 오류');
+            const response = await fetch('/api/bible-verses/random/en?count=3');
+            if (!response.ok) throw new Error('API error');
 
             const data = await response.json();
             this.state.verses = data.verses;
 
-            // 퀴즈 구절 랜덤 선택 (0, 1, 2 중 하나)
+            // Random quiz verse selection (0, 1, or 2)
             const randomIndex = Math.floor(Math.random() * data.verses.length);
             this.state.quizVerse = data.verses[randomIndex];
             this.state.revealedCount = 0;
@@ -665,17 +665,17 @@ const App = {
             this.renderSlides();
             this.showScreen('content');
 
-            // 화면 렌더링 후 네비게이션 설정
+            // Setup navigation after screen is rendered
             setTimeout(() => {
                 this.setupNavigation();
             }, 100);
         } catch (error) {
-            console.error('구절 로드 실패:', error);
+            console.error('Failed to load verses:', error);
             this.showScreen('error');
         }
     },
 
-    // ===== 화면 전환 =====
+    // ===== Screen Toggle =====
     showScreen: function(screen) {
         this.elements.loadingScreen.classList.add('hidden');
         this.elements.errorScreen.classList.add('hidden');
@@ -694,11 +694,11 @@ const App = {
         }
     },
 
-    // ===== 슬라이드 렌더링 =====
+    // ===== Render Slides =====
     renderSlides: function() {
         this.elements.scrollContainer.innerHTML = '';
 
-        // 구절 슬라이드 생성
+        // Create verse slides
         this.state.verses.forEach((verse, index) => {
             const slide = document.createElement('div');
             slide.className = 'slide';
@@ -721,41 +721,41 @@ const App = {
             this.elements.scrollContainer.appendChild(slide);
         });
 
-        // 퀴즈 슬라이드 생성
+        // Create quiz slide
         const quizSlide = document.createElement('div');
         quizSlide.className = 'slide';
         quizSlide.innerHTML = `
             <div class="quiz-card">
-                <h2 class="quiz-title">🤔 기억하시나요?</h2>
-                <p class="quiz-subtitle">빈칸을 클릭하여 단어를 확인하세요</p>
+                <h2 class="quiz-title">🤔 Do You Remember?</h2>
+                <p class="quiz-subtitle">Click the blanks to reveal the words</p>
                 <p id="quizText" class="quiz-text"></p>
                 <p id="quizRef" class="quiz-reference"></p>
 
                 <div class="quiz-stats">
                     <div class="stat-item">
                         <div class="stat-value" id="revealedCount">0</div>
-                        <div class="stat-label">맞춘 단어</div>
+                        <div class="stat-label">Correct</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="totalCount">0</div>
-                        <div class="stat-label">전체 단어</div>
+                        <div class="stat-label">Total</div>
                     </div>
                 </div>
 
                 <p id="completionMsg" class="completion-msg">
-                    🎉 축하합니다! 모든 단어를 맞추셨습니다!
+                    🎉 Congratulations! You got them all!
                 </p>
 
-                <button class="restart-btn" onclick="App.restart()">🔄 다시 시작</button>
+                <button class="restart-btn" onclick="App.restart()">🔄 Restart</button>
             </div>
         `;
         this.elements.scrollContainer.appendChild(quizSlide);
 
-        // 퀴즈 렌더링
+        // Render quiz
         this.renderQuiz();
     },
 
-    // ===== 퀴즈 렌더링 =====
+    // ===== Render Quiz =====
     renderQuiz: function() {
         const verse = this.state.quizVerse;
         let text = verse.text;
@@ -802,9 +802,9 @@ const App = {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     },
 
-    // ===== 네비게이션 설정 =====
+    // ===== Navigation Setup =====
     setupNavigation: function() {
-        // 인디케이터 생성
+        // Create indicators
         this.elements.navIndicators.innerHTML = '';
         for (let i = 0; i < this.state.totalSlides; i++) {
             const dot = document.createElement('div');
@@ -813,7 +813,7 @@ const App = {
             this.elements.navIndicators.appendChild(dot);
         }
 
-        // 스크롤 이벤트 리스너
+        // Scroll event listener
         this.elements.scrollContainer.addEventListener('scroll', () => {
             this.updateNavigation();
         });
@@ -821,7 +821,7 @@ const App = {
         this.updateNavigation();
     },
 
-    // ===== 네비게이션 업데이트 =====
+    // ===== Update Navigation =====
     updateNavigation: function() {
         const container = this.elements.scrollContainer;
         const slideWidth = container.clientWidth;
@@ -830,18 +830,18 @@ const App = {
 
         this.state.currentSlide = currentSlide;
 
-        // 인디케이터 업데이트
+        // Update indicators
         const dots = this.elements.navIndicators.querySelectorAll('.nav-dot');
         dots.forEach((dot, index) => {
             dot.classList.toggle('active', index === currentSlide);
         });
 
-        // 화살표 표시/숨김
+        // Show/hide arrows
         this.elements.navLeft.classList.toggle('hidden', currentSlide === 0);
         this.elements.navRight.classList.toggle('hidden', currentSlide === this.state.totalSlides - 1);
     },
 
-    // ===== 네비게이션 =====
+    // ===== Navigate =====
     navigate: function(direction) {
         const newSlide = this.state.currentSlide + direction;
         if (newSlide >= 0 && newSlide < this.state.totalSlides) {
@@ -858,7 +858,7 @@ const App = {
         });
     },
 
-    // ===== 단어 공개 =====
+    // ===== Reveal Word =====
     revealWord: function(uniqueId) {
         const span = document.querySelector(`.blind-word[data-id="${uniqueId}"]`);
         if (!span || span.classList.contains('revealed')) return;
@@ -878,7 +878,7 @@ const App = {
         }
     },
 
-    // ===== 재시작 =====
+    // ===== Restart =====
     restart: function() {
         this.state.revealedCount = 0;
         this.state.currentSlide = 0;
@@ -889,10 +889,10 @@ const App = {
     }
 };
 
-// 페이지 로드 시 초기화
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => App.init());
 
-// 키보드 네비게이션
+// Keyboard navigation
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') {
         App.navigate(-1);

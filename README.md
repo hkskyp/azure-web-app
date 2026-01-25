@@ -40,6 +40,49 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 - `/products/rearchai` - ReArchAI 제품
 - `/developers/float-bits` - IEEE 754 분석기
 - `/developers/coordinate-converter` - 좌표 변환기
+- `/bible-landing` - 성경 구절 랜딩 페이지 (한국어)
+- `/bible-landing/en` - 성경 구절 랜딩 페이지 (영어)
+
+## 성경 이미지 생성
+
+### Requirements
+- Python 3.10 (PyTorch는 3.13 미지원)
+- NVIDIA GPU + CUDA (로컬 생성 시)
+
+### Quick Start
+
+```bash
+# 1. 가상환경 생성 및 활성화
+py -3.10 -m venv .venv-img
+.venv-img\Scripts\activate
+
+# 2. 패키지 설치
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install diffusers transformers accelerate Pillow
+
+# 3. GPU 확인
+python scripts/check_gpu.py
+
+# 4. 이미지 생성
+python scripts/generate_images_diffusers.py
+
+# 5. WebP 변환
+python scripts/convert_to_webp.py
+```
+
+### Image Specifications
+- **Format**: WebP
+- **Size**: 768x432 (16:9)
+- **Style**: Watercolor painting
+- **File size**: < 100KB
+- **Location**: `static/images/bible/`
+- **Naming**: `{book}_{chapter}_{verse}.webp` (e.g., `psalm_23_1.webp`)
+
+### Scripts
+- `scripts/generate_bible_images.py` - 50개 프롬프트 생성
+- `scripts/generate_images_diffusers.py` - Stable Diffusion 로컬 생성
+- `scripts/convert_to_webp.py` - PNG/JPG → WebP 변환
+- `scripts/check_gpu.py` - GPU/CUDA 진단
 
 ## 배포
 `master` 브랜치 푸시 시 Azure Web App으로 자동 배포

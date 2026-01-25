@@ -2,6 +2,13 @@
 
 Lucasoft 회사 웹사이트 - FastAPI 기반, Azure Web App 배포
 
+## Workflow Rules (MUST)
+
+0. **세션 시작 시**: Serena MCP 초기화 수행
+   - `execute /mcp__serena__initial_instructions`
+1. **작업 시작 시**: `docs/tasks/` 문서를 읽고 작업 내용 파악, Phase별 Task를 todo 리스트에 등록
+   - `execute /mcp__serena__activate_project`
+
 # Code Style
 
 - Python 3.13 사용
