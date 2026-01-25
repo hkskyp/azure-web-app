@@ -7,7 +7,7 @@
 /* ===== 앱 컨테이너 ===== */
 .bible-app {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: var(--bg-white);
     padding: 2rem 0;
 }
 
@@ -19,14 +19,14 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: white;
+    color: var(--text-dark);
 }
 
 .spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid rgba(255,255,255,0.3);
-    border-top-color: white;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 1rem;
@@ -44,7 +44,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: white;
+    color: var(--text-dark);
     padding: 2rem;
 }
 
@@ -54,19 +54,21 @@
 }
 
 .retry-btn {
-    background: white;
-    color: #764ba2;
+    background: var(--primary-color);
+    color: white;
     border: none;
     padding: 0.75rem 2rem;
     border-radius: 25px;
     cursor: pointer;
     font-size: 1rem;
     margin-top: 1rem;
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .retry-btn:hover {
-    transform: scale(1.05);
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
 }
 
 /* ===== 컨텐츠 컨테이너 ===== */
@@ -79,7 +81,7 @@
 /* ===== 헤더 ===== */
 .page-header {
     text-align: center;
-    color: white;
+    color: var(--text-dark);
     margin-bottom: 3rem;
     padding: 2rem 0;
 }
@@ -88,23 +90,31 @@
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
     font-weight: 700;
+    color: var(--primary-color);
 }
 
 .page-header p {
     font-size: 1.1rem;
-    opacity: 0.9;
+    color: var(--text-gray);
 }
 
 /* ===== 구절 카드 ===== */
 .verse-card {
-    background: rgba(255,255,255,0.95);
-    border-radius: 20px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin-bottom: 2rem;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.6s ease forwards;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.verse-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
 }
 
 .verse-card:nth-child(1) { animation-delay: 0.1s; }
@@ -122,7 +132,7 @@
     width: 100%;
     height: 300px;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-light);
 }
 
 .verse-image img {
@@ -142,7 +152,7 @@
     height: 40px;
     line-height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--primary-color);
     color: white;
     font-weight: 700;
     margin-bottom: 1rem;
@@ -151,25 +161,26 @@
 .verse-text {
     font-size: 1.5rem;
     line-height: 1.8;
-    color: #333;
+    color: var(--text-dark);
     margin-bottom: 1rem;
-    font-family: 'Noto Serif KR', serif;
+    font-weight: 500;
 }
 
 .verse-reference {
-    color: #666;
+    color: var(--text-gray);
     font-size: 1rem;
     font-weight: 600;
 }
 
 /* ===== 퀴즈 섹션 ===== */
 .quiz-section {
-    background: rgba(255,255,255,0.95);
-    border-radius: 20px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     padding: 3rem 2rem;
     text-align: center;
     margin-bottom: 2rem;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.6s ease forwards;
@@ -177,14 +188,14 @@
 }
 
 .quiz-title {
-    color: #764ba2;
+    color: var(--primary-color);
     margin-bottom: 1.5rem;
     font-size: 2rem;
     font-weight: 700;
 }
 
 .quiz-subtitle {
-    color: #666;
+    color: var(--text-gray);
     margin-bottom: 2rem;
     font-size: 1.1rem;
 }
@@ -192,13 +203,13 @@
 .quiz-text {
     font-size: 1.4rem;
     line-height: 2;
-    color: #333;
+    color: var(--text-dark);
     margin-bottom: 1.5rem;
-    font-family: 'Noto Serif KR', serif;
+    font-weight: 500;
 }
 
 .quiz-reference {
-    color: #666;
+    color: var(--text-gray);
     margin-bottom: 2rem;
     font-size: 1.1rem;
     font-weight: 600;
@@ -236,8 +247,8 @@
 }
 
 .blind-word.revealed {
-    background: #fff5f5;
-    color: #ff4b4b;
+    background: var(--primary-light);
+    color: var(--primary-color);
     animation: revealPop 0.4s ease;
 }
 
@@ -275,7 +286,7 @@
 
 /* ===== 버튼 ===== */
 .restart-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--primary-color);
     color: white;
     border: none;
     padding: 1rem 3rem;
@@ -284,12 +295,13 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin-top: 1.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .restart-btn:hover {
+    background: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
 }
 
 /* ===== 통계 정보 ===== */
@@ -310,12 +322,12 @@
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
-    color: #764ba2;
+    color: var(--primary-color);
 }
 
 .stat-label {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-gray);
     margin-top: 0.25rem;
 }
 
