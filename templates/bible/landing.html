@@ -1,28 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}오늘의 말씀 | 매일 성경 구절{% endblock %}
+{% block title %}{% if lang == "ko" %}[lucasoft] | 매일 성경 구절{% else %}[lucasoft] | Inspiring Scripture | Free Online Bible Quotes{% endif %}{% endblock %}
 
 {% block head %}
+{% if lang == "ko" %}
 <meta name="description" content="매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요. 시편, 요한복음, 마태복음 등 감동적인 성경 말씀을 무료로 제공합니다. 하나님의 말씀으로 하루를 시작하세요.">
 <meta name="keywords" content="오늘의 말씀, 성경 구절, 성경 퀴즈, 성경 암송, 시편, 요한복음, 마태복음, 기독교, 하나님 말씀, 무료 성경">
-<meta property="og:title" content="오늘의 말씀 | 매일 성경 구절">
+<meta property="og:title" content="[lucasoft] | 매일 성경 구절">
 <meta property="og:description" content="매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요. 무료 성경 말씀으로 하루를 시작하세요.">
+{% else %}
+<meta name="description" content="Read inspiring daily Bible verses and test your memory with interactive Bible quizzes. Free online Bible quotes from Psalms, John, Matthew, and more. Start your day with God's Word.">
+<meta name="keywords" content="daily bible verses, bible quotes, scripture, bible quiz, inspirational quotes, psalm, john, matthew, christian faith, god's word, free bible">
+<meta property="og:title" content="[lucasoft] | Free Inspiring Scripture">
+<meta property="og:description" content="Read inspiring daily Bible verses and test your memory with interactive quizzes. Free online Bible quotes to start your day.">
+{% endif %}
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://lucasoft.ai.kr/bible-landing">
-<link rel="canonical" href="https://lucasoft.ai.kr/bible-landing">
-<link rel="alternate" hreflang="ko" href="https://lucasoft.ai.kr/bible-landing">
-<link rel="alternate" hreflang="en" href="https://lucasoft.ai.kr/bible-landing/en">
-<link rel="alternate" hreflang="x-default" href="https://lucasoft.ai.kr/bible-landing/en">
+<meta property="og:url" content="https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}">
+<link rel="canonical" href="https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}">
+<link rel="alternate" hreflang="ko" href="https://lucasoft.ai.kr/bible-landing?lang=ko">
+<link rel="alternate" hreflang="en" href="https://lucasoft.ai.kr/bible-landing?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://lucasoft.ai.kr/bible-landing?lang=en">
 
 <!-- 구조화된 데이터 (Schema.org) - SEO 최적화: 전체 구절 크롤링 -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "오늘의 말씀 | 매일 성경 구절",
-  "description": "매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요",
-  "url": "https://lucasoft.ai.kr/bible-landing",
-  "inLanguage": "ko",
+  "name": "{% if lang == 'ko' %}[lucasoft] | 매일 성경 구절{% else %}[lucasoft] | Inspiring Scripture{% endif %}",
+  "description": "{% if lang == 'ko' %}매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요{% else %}Read inspiring daily Bible verses and test your memory with interactive quizzes{% endif %}",
+  "url": "https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}",
+  "inLanguage": "{{ lang }}",
   "hasPart": [
     {% for verse in all_verses %}
     {
@@ -31,7 +38,7 @@
       "text": "{{ verse.text }}",
       "author": {
         "@type": "Organization",
-        "name": "성경"
+        "name": "{% if lang == 'ko' %}성경{% else %}The Bible{% endif %}"
       }
     }{% if not loop.last %},{% endif %}
     {% endfor %}
@@ -142,11 +149,12 @@
 
 /* ===== 언어 전환 버튼 ===== */
 .lang-switcher {
-    position: absolute;
-    top: 1rem;
+    position: fixed;
+    top: calc(var(--header-height) + 1rem);
     right: 1rem;
     display: flex;
     gap: 0.5rem;
+    z-index: 200;
 }
 
 .lang-btn {
@@ -176,11 +184,12 @@
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: x proximity;
     scroll-behavior: smooth;
     height: 100%;
     padding-top: 100px;
     -webkit-overflow-scrolling: touch;
+    scroll-padding: 0 2rem;
 }
 
 /* 스크롤바 숨기기 (선택사항) */
@@ -508,13 +517,14 @@
     }
 
     .lang-switcher {
-        top: 0.75rem;
-        right: 0.75rem;
+        top: calc(var(--header-height) + 0.5rem);
+        right: 0.5rem;
     }
 
     .lang-btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.8rem;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .scroll-container {
@@ -570,31 +580,31 @@
 
 {% block content %}
 <div id="bibleApp" class="bible-app">
+    <!-- 언어 전환 버튼 (항상 표시) -->
+    <div class="lang-switcher">
+        <button class="lang-btn {% if lang == 'ko' %}active{% endif %}" data-lang="ko" onclick="App.switchLanguage('ko')">한국어</button>
+        <button class="lang-btn {% if lang == 'en' %}active{% endif %}" data-lang="en" onclick="App.switchLanguage('en')">English</button>
+    </div>
+
     <!-- 로딩 화면 -->
     <div id="loadingScreen" class="loading-screen">
         <div class="spinner"></div>
-        <p>말씀을 준비하고 있습니다...</p>
+        <p>{% if lang == "ko" %}말씀을 준비하고 있습니다...{% else %}Preparing the Word...{% endif %}</p>
     </div>
 
     <!-- 에러 화면 -->
     <div id="errorScreen" class="error-screen hidden">
         <div class="error-icon">😔</div>
-        <p>말씀을 불러오는데 실패했습니다.</p>
-        <button class="retry-btn" onclick="App.init()">다시 시도</button>
+        <p>{% if lang == "ko" %}말씀을 불러오는데 실패했습니다.{% else %}Failed to load verses.{% endif %}</p>
+        <button class="retry-btn" onclick="App.init()">{% if lang == "ko" %}다시 시도{% else %}Retry{% endif %}</button>
     </div>
 
     <!-- 컨텐츠 -->
     <div id="contentWrapper" class="content-wrapper hidden">
-        <!-- 언어 전환 버튼 -->
-        <div class="lang-switcher">
-            <a href="/bible-landing" class="lang-btn active">한국어</a>
-            <a href="/bible-landing/en" class="lang-btn">English</a>
-        </div>
-
         <!-- 헤더 -->
         <div class="page-header">
-            <h1>오늘의 말씀</h1>
-            <p>하나님의 말씀으로 하루를 시작하세요</p>
+            <h1>{% if lang == "ko" %}오늘의 말씀{% else %}Daily Bible Verses{% endif %}</h1>
+            <p>{% if lang == "ko" %}하나님의 말씀으로 하루를 시작하세요{% else %}Start your day with God's Word{% endif %}</p>
         </div>
 
         <!-- 스크롤 컨테이너 -->
@@ -614,11 +624,47 @@
 
 {% block extra_js %}
 <script>
+// 현재 언어 설정 (서버에서 전달된 값)
+let CURRENT_LANG = "{{ lang }}";
+
+// 언어별 텍스트 정의
+const TEXTS = {
+    ko: {
+        loading: '말씀을 준비하고 있습니다...',
+        error: '말씀을 불러오는데 실패했습니다.',
+        retry: '다시 시도',
+        pageTitle: '오늘의 말씀',
+        pageSubtitle: '하나님의 말씀으로 하루를 시작하세요',
+        quizTitle: '🤔 기억하시나요?',
+        quizSubtitle: '빈칸을 클릭하여 단어를 확인하세요',
+        correctLabel: '맞춘 단어',
+        totalLabel: '전체 단어',
+        completionMsg: '🎉 축하합니다! 모든 단어를 맞추셨습니다!',
+        restartBtn: '🔄 다시 시작'
+    },
+    en: {
+        loading: 'Preparing the Word...',
+        error: 'Failed to load verses.',
+        retry: 'Retry',
+        pageTitle: 'Daily Bible Verses',
+        pageSubtitle: "Start your day with God's Word",
+        quizTitle: '🤔 Do You Remember?',
+        quizSubtitle: 'Click the blanks to reveal the words',
+        correctLabel: 'Correct',
+        totalLabel: 'Total',
+        completionMsg: '🎉 Congratulations! You got them all!',
+        restartBtn: '🔄 Restart'
+    }
+};
+
 const App = {
     // ===== 상태 관리 =====
     state: {
         verses: [],
+        versesKo: [],
+        versesEn: [],
         quizVerse: null,
+        quizVerseIndex: 0,
         revealedCount: 0,
         totalBlindWords: 0,
         currentSlide: 0,
@@ -651,15 +697,32 @@ const App = {
         this.showScreen('loading');
 
         try {
-            const response = await fetch('/api/bible-verses/random?count=3');
-            if (!response.ok) throw new Error('API 오류');
+            // 한국어 데이터를 먼저 가져와서 랜덤 3개 선택
+            const responseKo = await fetch('/api/bible-verses/random?count=3');
+            if (!responseKo.ok) throw new Error('API error');
 
-            const data = await response.json();
-            this.state.verses = data.verses;
+            const dataKo = await responseKo.json();
+            this.state.versesKo = dataKo.verses;
+
+            // 선택된 한국어 구절의 id를 기반으로 영어 버전 가져오기
+            const selectedIds = this.state.versesKo.map(v => v.id).join(',');
+
+            const responseEn = await fetch(`/api/bible-verses/random/en?ids=${selectedIds}`);
+            if (!responseEn.ok) throw new Error('API error');
+
+            const dataEn = await responseEn.json();
+
+            // id 순서대로 정렬 (한국어와 동일한 순서 보장)
+            this.state.versesEn = this.state.versesKo.map(koVerse =>
+                dataEn.verses.find(enVerse => enVerse.id === koVerse.id)
+            ).filter(v => v !== undefined);
+
+            // 현재 언어에 맞는 verses 설정
+            this.state.verses = CURRENT_LANG === 'ko' ? this.state.versesKo : this.state.versesEn;
 
             // 퀴즈 구절 랜덤 선택 (0, 1, 2 중 하나)
-            const randomIndex = Math.floor(Math.random() * data.verses.length);
-            this.state.quizVerse = data.verses[randomIndex];
+            this.state.quizVerseIndex = Math.floor(Math.random() * this.state.verses.length);
+            this.state.quizVerse = this.state.verses[this.state.quizVerseIndex];
             this.state.revealedCount = 0;
 
             this.renderSlides();
@@ -670,9 +733,59 @@ const App = {
                 this.setupNavigation();
             }, 100);
         } catch (error) {
-            console.error('구절 로드 실패:', error);
+            console.error('Failed to load verses:', error);
             this.showScreen('error');
         }
+    },
+
+    // ===== 언어 전환 =====
+    switchLanguage: function(lang) {
+        if (lang === CURRENT_LANG) return;
+
+        CURRENT_LANG = lang;
+
+        // 현재 언어에 맞는 verses 설정
+        this.state.verses = lang === 'ko' ? this.state.versesKo : this.state.versesEn;
+        this.state.quizVerse = this.state.verses[this.state.quizVerseIndex];
+
+        // URL 업데이트 (페이지 새로고침 없이)
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        window.history.pushState({}, '', url);
+
+        // 언어 버튼 활성화 상태 변경
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+        });
+
+        // 화면 텍스트 업데이트
+        this.updateTexts();
+
+        // 슬라이드 다시 렌더링
+        this.renderSlides();
+    },
+
+    // ===== 텍스트 업데이트 =====
+    updateTexts: function() {
+        const texts = TEXTS[CURRENT_LANG];
+
+        // 로딩 화면
+        const loadingText = document.querySelector('#loadingScreen p');
+        if (loadingText) loadingText.textContent = texts.loading;
+
+        // 에러 화면
+        const errorText = document.querySelector('#errorScreen p');
+        if (errorText) errorText.textContent = texts.error;
+
+        const retryBtn = document.querySelector('#errorScreen .retry-btn');
+        if (retryBtn) retryBtn.textContent = texts.retry;
+
+        // 헤더
+        const pageTitle = document.querySelector('.page-header h1');
+        if (pageTitle) pageTitle.textContent = texts.pageTitle;
+
+        const pageSubtitle = document.querySelector('.page-header p');
+        if (pageSubtitle) pageSubtitle.textContent = texts.pageSubtitle;
     },
 
     // ===== 화면 전환 =====
@@ -724,29 +837,31 @@ const App = {
         // 퀴즈 슬라이드 생성
         const quizSlide = document.createElement('div');
         quizSlide.className = 'slide';
+        const texts = TEXTS[CURRENT_LANG];
+
         quizSlide.innerHTML = `
             <div class="quiz-card">
-                <h2 class="quiz-title">🤔 기억하시나요?</h2>
-                <p class="quiz-subtitle">빈칸을 클릭하여 단어를 확인하세요</p>
+                <h2 class="quiz-title">${texts.quizTitle}</h2>
+                <p class="quiz-subtitle">${texts.quizSubtitle}</p>
                 <p id="quizText" class="quiz-text"></p>
                 <p id="quizRef" class="quiz-reference"></p>
 
                 <div class="quiz-stats">
                     <div class="stat-item">
                         <div class="stat-value" id="revealedCount">0</div>
-                        <div class="stat-label">맞춘 단어</div>
+                        <div class="stat-label">${texts.correctLabel}</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="totalCount">0</div>
-                        <div class="stat-label">전체 단어</div>
+                        <div class="stat-label">${texts.totalLabel}</div>
                     </div>
                 </div>
 
                 <p id="completionMsg" class="completion-msg">
-                    🎉 축하합니다! 모든 단어를 맞추셨습니다!
+                    ${texts.completionMsg}
                 </p>
 
-                <button class="restart-btn" onclick="App.restart()">🔄 다시 시작</button>
+                <button class="restart-btn" onclick="App.restart()">${texts.restartBtn}</button>
             </div>
         `;
         this.elements.scrollContainer.appendChild(quizSlide);
