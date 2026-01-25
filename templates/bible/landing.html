@@ -49,11 +49,48 @@
 
 {% block extra_css %}
 <style>
+/* ===== 점 패턴 배경 제거 ===== */
+.main-content::before {
+    display: none;
+}
+
+/* ===== 페이지 헤더 내 언어 전환 버튼 ===== */
+.page-header {
+    position: relative;
+}
+
+.page-header .lang-switcher {
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    color: var(--text-dark);
+}
+
+.lang-btn:hover {
+    background: var(--bg-light);
+}
+
+.lang-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
 /* ===== 앱 컨테이너 ===== */
 .bible-app {
-    min-height: calc(100vh - var(--header-height));
-    background-color: var(--bg-white);
-    overflow: hidden;
+    min-height: 400px;
 }
 
 /* ===== 로딩 화면 ===== */
@@ -118,65 +155,20 @@
 
 /* ===== 컨텐츠 컨테이너 ===== */
 .content-wrapper {
-    height: calc(100vh - var(--header-height));
-    position: relative;
+    width: 100%;
 }
 
-/* ===== 헤더 ===== */
-.page-header {
-    text-align: center;
-    color: var(--text-dark);
-    padding: 2rem 1rem 1rem;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    background: linear-gradient(to bottom, var(--bg-white) 80%, transparent);
-}
-
-.page-header h1 {
-    font-size: 2rem;
-    margin-bottom: 0.25rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.page-header p {
-    font-size: 0.95rem;
-    color: var(--text-gray);
-}
-
-/* ===== 언어 전환 버튼 ===== */
-.lang-switcher {
-    position: fixed;
-    top: calc(var(--header-height) + 1rem);
-    right: 1rem;
+/* ===== 구절 컨테이너 (세로 레이아웃) ===== */
+.verses-container {
     display: flex;
-    gap: 0.5rem;
-    z-index: 200;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
 }
 
-.lang-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border-color);
-    background: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    color: var(--text-dark);
-}
-
-.lang-btn:hover {
-    background: var(--bg-light);
-}
-
-.lang-btn.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+/* ===== 퀴즈 컨테이너 ===== */
+.quiz-container {
+    margin-top: 2rem;
 }
 
 /* ===== 스크롤 컨테이너 ===== */
@@ -504,27 +496,15 @@
 
 /* ===== 반응형 ===== */
 @media (max-width: 768px) {
-    .page-header h1 {
-        font-size: 1.5rem;
-    }
-
-    .page-header p {
-        font-size: 0.875rem;
-    }
-
-    .page-header {
-        padding: 1.5rem 1rem 0.75rem;
-    }
-
-    .lang-switcher {
-        top: calc(var(--header-height) + 0.5rem);
-        right: 0.5rem;
+    .page-header .lang-switcher {
+        position: static;
+        justify-content: center;
+        margin-bottom: 1rem;
     }
 
     .lang-btn {
         padding: 0.4rem 0.7rem;
         font-size: 0.75rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .scroll-container {
@@ -579,45 +559,42 @@
 {% endblock %}
 
 {% block content %}
-<div id="bibleApp" class="bible-app">
-    <!-- 언어 전환 버튼 (항상 표시) -->
+<!-- 페이지 헤더 -->
+<div class="page-header">
+    <!-- 언어 전환 버튼 -->
     <div class="lang-switcher">
         <button class="lang-btn {% if lang == 'ko' %}active{% endif %}" data-lang="ko" onclick="App.switchLanguage('ko')">한국어</button>
         <button class="lang-btn {% if lang == 'en' %}active{% endif %}" data-lang="en" onclick="App.switchLanguage('en')">English</button>
     </div>
 
-    <!-- 로딩 화면 -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="spinner"></div>
-        <p>{% if lang == "ko" %}말씀을 준비하고 있습니다...{% else %}Preparing the Word...{% endif %}</p>
-    </div>
+    <h1 class="page-title">{% if lang == "ko" %}📖 오늘의 말씀{% else %}📖 Daily Bible Verses{% endif %}</h1>
+    <p class="page-description">{% if lang == "ko" %}하나님의 말씀으로 하루를 시작하세요{% else %}Start your day with God's Word{% endif %}</p>
+</div>
 
-    <!-- 에러 화면 -->
-    <div id="errorScreen" class="error-screen hidden">
-        <div class="error-icon">😔</div>
-        <p>{% if lang == "ko" %}말씀을 불러오는데 실패했습니다.{% else %}Failed to load verses.{% endif %}</p>
-        <button class="retry-btn" onclick="App.init()">{% if lang == "ko" %}다시 시도{% else %}Retry{% endif %}</button>
-    </div>
-
-    <!-- 컨텐츠 -->
-    <div id="contentWrapper" class="content-wrapper hidden">
-        <!-- 헤더 -->
-        <div class="page-header">
-            <h1>{% if lang == "ko" %}오늘의 말씀{% else %}Daily Bible Verses{% endif %}</h1>
-            <p>{% if lang == "ko" %}하나님의 말씀으로 하루를 시작하세요{% else %}Start your day with God's Word{% endif %}</p>
+<!-- 제품 컨테이너 -->
+<div class="product-container">
+    <div id="bibleApp" class="bible-app">
+        <!-- 로딩 화면 -->
+        <div id="loadingScreen" class="loading-screen">
+            <div class="spinner"></div>
+            <p>{% if lang == "ko" %}말씀을 준비하고 있습니다...{% else %}Preparing the Word...{% endif %}</p>
         </div>
 
-        <!-- 스크롤 컨테이너 -->
-        <div id="scrollContainer" class="scroll-container">
-            <!-- 구절 슬라이드들이 여기에 동적으로 추가됨 -->
+        <!-- 에러 화면 -->
+        <div id="errorScreen" class="error-screen hidden">
+            <div class="error-icon">😔</div>
+            <p>{% if lang == "ko" %}말씀을 불러오는데 실패했습니다.{% else %}Failed to load verses.{% endif %}</p>
+            <button class="retry-btn" onclick="App.init()">{% if lang == "ko" %}다시 시도{% else %}Retry{% endif %}</button>
         </div>
 
-        <!-- 네비게이션 화살표 -->
-        <div id="navLeft" class="nav-arrow left hidden" onclick="App.navigate(-1)">‹</div>
-        <div id="navRight" class="nav-arrow right" onclick="App.navigate(1)">›</div>
+        <!-- 컨텐츠 -->
+        <div id="contentWrapper" class="content-wrapper hidden">
+            <!-- 구절 카드들 -->
+            <div id="versesContainer" class="verses-container"></div>
 
-        <!-- 네비게이션 인디케이터 -->
-        <div id="navIndicators" class="nav-indicators"></div>
+            <!-- 퀴즈 섹션 -->
+            <div id="quizContainer" class="quiz-container"></div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -685,10 +662,8 @@ const App = {
             loadingScreen: document.getElementById('loadingScreen'),
             errorScreen: document.getElementById('errorScreen'),
             contentWrapper: document.getElementById('contentWrapper'),
-            scrollContainer: document.getElementById('scrollContainer'),
-            navLeft: document.getElementById('navLeft'),
-            navRight: document.getElementById('navRight'),
-            navIndicators: document.getElementById('navIndicators')
+            versesContainer: document.getElementById('versesContainer'),
+            quizContainer: document.getElementById('quizContainer')
         };
     },
 
@@ -727,11 +702,6 @@ const App = {
 
             this.renderSlides();
             this.showScreen('content');
-
-            // 화면 렌더링 후 네비게이션 설정
-            setTimeout(() => {
-                this.setupNavigation();
-            }, 100);
         } catch (error) {
             console.error('Failed to load verses:', error);
             this.showScreen('error');
@@ -809,37 +779,33 @@ const App = {
 
     // ===== 슬라이드 렌더링 =====
     renderSlides: function() {
-        this.elements.scrollContainer.innerHTML = '';
+        this.elements.versesContainer.innerHTML = '';
+        this.elements.quizContainer.innerHTML = '';
 
-        // 구절 슬라이드 생성
+        // 구절 카드 생성 (세로 레이아웃)
         this.state.verses.forEach((verse, index) => {
-            const slide = document.createElement('div');
-            slide.className = 'slide';
-            slide.innerHTML = `
-                <div class="verse-card">
-                    <div class="verse-image">
-                        <img src="/static/images/bible/${verse.image}"
-                             alt="${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}"
-                             onerror="this.src='/static/images/bible/placeholder.webp'">
-                    </div>
-                    <div class="verse-content">
-                        <div class="verse-number">${index + 1}</div>
-                        <p class="verse-text">${verse.text}</p>
-                        <p class="verse-reference">
-                            ${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}
-                        </p>
-                    </div>
+            const card = document.createElement('div');
+            card.className = 'verse-card';
+            card.innerHTML = `
+                <div class="verse-image">
+                    <img src="/static/images/bible/${verse.image}"
+                         alt="${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}"
+                         onerror="this.src='/static/images/bible/placeholder.webp'">
+                </div>
+                <div class="verse-content">
+                    <div class="verse-number">${index + 1}</div>
+                    <p class="verse-text">${verse.text}</p>
+                    <p class="verse-reference">
+                        ${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}
+                    </p>
                 </div>
             `;
-            this.elements.scrollContainer.appendChild(slide);
+            this.elements.versesContainer.appendChild(card);
         });
 
-        // 퀴즈 슬라이드 생성
-        const quizSlide = document.createElement('div');
-        quizSlide.className = 'slide';
+        // 퀴즈 섹션 생성
         const texts = TEXTS[CURRENT_LANG];
-
-        quizSlide.innerHTML = `
+        this.elements.quizContainer.innerHTML = `
             <div class="quiz-card">
                 <h2 class="quiz-title">${texts.quizTitle}</h2>
                 <p class="quiz-subtitle">${texts.quizSubtitle}</p>
@@ -864,7 +830,6 @@ const App = {
                 <button class="restart-btn" onclick="App.restart()">${texts.restartBtn}</button>
             </div>
         `;
-        this.elements.scrollContainer.appendChild(quizSlide);
 
         // 퀴즈 렌더링
         this.renderQuiz();
@@ -996,11 +961,7 @@ const App = {
     // ===== 재시작 =====
     restart: function() {
         this.state.revealedCount = 0;
-        this.state.currentSlide = 0;
-        this.scrollToSlide(0);
-        setTimeout(() => {
-            this.fetchVerses();
-        }, 500);
+        this.fetchVerses();
     }
 };
 
