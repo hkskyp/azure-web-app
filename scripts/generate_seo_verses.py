@@ -39,7 +39,9 @@ for idx, verse in enumerate(data['verses'], 1):
             'book': ko_book,
             'chapter': int(ko_chapter_verse[0]),
             'verse': int(ko_chapter_verse[1])
-        }
+        },
+        'image': 'placeholder.webp',  # 기본 이미지
+        'blind_words': []  # 빈 배열 (퀴즈 기능용)
     }
     verses_ko.append(ko_entry)
 
@@ -56,7 +58,9 @@ for idx, verse in enumerate(data['verses'], 1):
             'book': en_book,
             'chapter': int(en_chapter_verse[0]),
             'verse': int(en_chapter_verse[1])
-        }
+        },
+        'image': 'placeholder.webp',  # 기본 이미지
+        'blind_words': []  # 빈 배열 (퀴즈 기능용)
     }
     verses_en.append(en_entry)
 
