@@ -164,7 +164,6 @@
 .content-wrapper {
     height: 650px;
     position: relative;
-    padding-bottom: 2.5rem;
 }
 
 /* ===== 스크롤 컨테이너 (가로 스와이프) ===== */
@@ -240,6 +239,9 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     max-width: 700px;
     width: 90%;
+    max-height: 580px;
+    display: flex;
+    flex-direction: column;
     transition: box-shadow 0.3s ease;
 }
 
@@ -256,6 +258,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    flex-shrink: 0;
 }
 
 .verse-image img {
@@ -290,6 +293,9 @@
 .verse-content {
     padding: 2rem;
     text-align: center;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 .verse-number {
@@ -328,7 +334,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     max-width: 700px;
     width: 90%;
-    max-height: 550px;
+    max-height: 580px;
     overflow-y: auto;
 }
 
@@ -476,38 +482,6 @@
     box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
 }
 
-/* ===== 네비게이션 인디케이터 ===== */
-.nav-indicators {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 0.5rem;
-    z-index: 100;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 0.5rem 1rem;
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-}
-
-.nav-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--border-color);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.nav-dot.active {
-    background: var(--primary-color);
-    transform: scale(1.3);
-}
-
-.nav-dot:hover {
-    background: var(--primary-hover);
-}
 
 /* ===== 네비게이션 화살표 ===== */
 .nav-arrow {
@@ -563,7 +537,6 @@
 
     .content-wrapper {
         height: 550px;
-        padding-bottom: 2.5rem;
     }
 
     .slide {
@@ -572,11 +545,12 @@
 
     .verse-card {
         width: 95%;
+        max-height: 480px;
     }
 
     .quiz-card {
         width: 95%;
-        max-height: 450px;
+        max-height: 480px;
     }
 
     .verse-image {
@@ -615,11 +589,6 @@
     /* 모바일에서 화살표 숨김 (스와이프만 사용) */
     .nav-arrow {
         display: none !important;
-    }
-
-    .nav-indicators {
-        bottom: 0;
-        padding: 0.4rem 0.8rem;
     }
 }
 
@@ -669,9 +638,6 @@
             <!-- 네비게이션 화살표 -->
             <div id="navLeft" class="nav-arrow left hidden" onclick="App.navigate(-1)">‹</div>
             <div id="navRight" class="nav-arrow right" onclick="App.navigate(1)">›</div>
-
-            <!-- 네비게이션 인디케이터 -->
-            <div id="navIndicators" class="nav-indicators"></div>
         </div>
     </div>
 </div>
@@ -742,8 +708,7 @@ const App = {
             contentWrapper: document.getElementById('contentWrapper'),
             scrollContainer: document.getElementById('scrollContainer'),
             navLeft: document.getElementById('navLeft'),
-            navRight: document.getElementById('navRight'),
-            navIndicators: document.getElementById('navIndicators')
+            navRight: document.getElementById('navRight')
         };
     },
 
@@ -1014,15 +979,6 @@ const App = {
 
     // ===== 네비게이션 설정 =====
     setupNavigation: function() {
-        // 인디케이터 생성
-        this.elements.navIndicators.innerHTML = '';
-        for (let i = 0; i < this.state.totalSlides; i++) {
-            const dot = document.createElement('div');
-            dot.className = `nav-dot ${i === 0 ? 'active' : ''}`;
-            dot.onclick = () => this.scrollToSlide(i);
-            this.elements.navIndicators.appendChild(dot);
-        }
-
         // 스크롤 이벤트 리스너
         this.elements.scrollContainer.addEventListener('scroll', () => {
             this.updateNavigation();
@@ -1039,12 +995,6 @@ const App = {
         const currentSlide = Math.round(scrollLeft / slideWidth);
 
         this.state.currentSlide = currentSlide;
-
-        // 인디케이터 업데이트
-        const dots = this.elements.navIndicators.querySelectorAll('.nav-dot');
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentSlide);
-        });
 
         // 화살표 표시/숨김
         this.elements.navLeft.classList.toggle('hidden', currentSlide === 0);
@@ -1070,15 +1020,6 @@ const App = {
 
     // ===== 네비게이션 설정 =====
     setupNavigation: function() {
-        // 인디케이터 생성
-        this.elements.navIndicators.innerHTML = '';
-        for (let i = 0; i < this.state.totalSlides; i++) {
-            const dot = document.createElement('div');
-            dot.className = `nav-dot ${i === 0 ? 'active' : ''}`;
-            dot.onclick = () => this.scrollToSlide(i);
-            this.elements.navIndicators.appendChild(dot);
-        }
-
         // 스크롤 이벤트 리스너
         this.elements.scrollContainer.addEventListener('scroll', () => {
             this.updateNavigation();
@@ -1095,12 +1036,6 @@ const App = {
         const currentSlide = Math.round(scrollLeft / slideWidth);
 
         this.state.currentSlide = currentSlide;
-
-        // 인디케이터 업데이트
-        const dots = this.elements.navIndicators.querySelectorAll('.nav-dot');
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentSlide);
-        });
 
         // 화살표 표시/숨김
         this.elements.navLeft.classList.toggle('hidden', currentSlide === 0);
