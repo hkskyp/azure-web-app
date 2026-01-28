@@ -657,6 +657,35 @@ body {
     color: var(--bg-white);
 }
 
+/* SNS 링크 */
+.footer-social {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #444;
+    border-radius: 50%;
+    color: #ccc;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    transform: translateY(-3px);
+}
+
+.social-link svg {
+    width: 20px;
+    height: 20px;
+}
+
 .footer-info {
     padding: 1.5rem 0;
 }
@@ -986,6 +1015,10 @@ body {
         flex-wrap: wrap;
         justify-content: center;
         gap: 1rem;
+    }
+
+    .footer-social {
+        justify-content: center;
     }
 }
 
