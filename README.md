@@ -40,8 +40,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 - `/products/rearchai` - ReArchAI 제품
 - `/developers/float-bits` - IEEE 754 분석기
 - `/developers/coordinate-converter` - 좌표 변환기
-- `/bible-landing` - 성경 구절 랜딩 페이지 (한국어)
-- `/bible-landing/en` - 성경 구절 랜딩 페이지 (영어)
+- `/bible` - 성경 구절 랜딩 페이지 (한국어/영어)
 
 ## 성경 이미지 생성
 

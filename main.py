@@ -9,6 +9,7 @@ from coordinate_converter import CoordinateConverter
 from data.certificates import CERTIFICATES
 from data.bible_verses import BIBLE_VERSES
 from data.bible_verses_en import BIBLE_VERSES_EN
+from data.bible_verses_seo import BIBLE_VERSES_SEO_KO, BIBLE_VERSES_SEO_EN
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -88,29 +89,29 @@ async def wes_page(request: Request):
         {"request": request, "current_page": "wes"}
     )
 
-@app.get("/bible-landing", response_class=HTMLResponse)
+@app.get("/bible", response_class=HTMLResponse)
 async def bible_landing_page(request: Request, lang: str = "ko"):
     """성경 구절 랜딩 페이지 (한국어/English)"""
     # 언어 파라미터 검증 (ko 또는 en만 허용)
     if lang not in ["ko", "en"]:
         lang = "ko"
 
-    # 언어에 따라 다른 데이터 선택
-    all_verses = BIBLE_VERSES if lang == "ko" else BIBLE_VERSES_EN
+    # SEO용: 전체 30,923개 구절 (크롤러에게 노출)
+    all_verses_seo = BIBLE_VERSES_SEO_KO if lang == "ko" else BIBLE_VERSES_SEO_EN
 
     return templates.TemplateResponse(
         "bible/landing.html",
         {
             "request": request,
-            "current_page": "bible-landing",
+            "current_page": "bible",
             "lang": lang,
-            "all_verses": all_verses  # SEO용 전체 구절
+            "all_verses": all_verses_seo  # SEO용 전체 구절 (30,923개)
         }
     )
 
 @app.get("/api/bible-verses/random")
 async def get_random_bible_verses(count: int = 3, ids: str = None):
-    """랜덤 성경 구절 API (한국어)
+    """랜덤 성경 구절 API (한국어) - 전체 30,923개 중 선택
 
     Args:
         count: 반환할 구절 수 (기본값: 3)
@@ -121,16 +122,16 @@ async def get_random_bible_verses(count: int = 3, ids: str = None):
     if ids:
         # 특정 id들의 구절 반환
         id_list = [int(id.strip()) for id in ids.split(',')]
-        selected = [v for v in BIBLE_VERSES if v['id'] in id_list]
+        selected = [v for v in BIBLE_VERSES_SEO_KO if v['id'] in id_list]
     else:
-        # 랜덤 선택
-        selected = random.sample(BIBLE_VERSES, min(count, len(BIBLE_VERSES)))
+        # 전체 30,923개 중 랜덤 선택
+        selected = random.sample(BIBLE_VERSES_SEO_KO, min(count, len(BIBLE_VERSES_SEO_KO)))
 
     return JSONResponse(content={"verses": selected})
 
 @app.get("/api/bible-verses/random/en")
 async def get_random_bible_verses_en(count: int = 3, ids: str = None):
-    """Random Bible Verses API (English)
+    """Random Bible Verses API (English) - Select from all 30,923 verses
 
     Args:
         count: Number of verses to return (default: 3)
@@ -141,10 +142,10 @@ async def get_random_bible_verses_en(count: int = 3, ids: str = None):
     if ids:
         # Return specific verses by IDs
         id_list = [int(id.strip()) for id in ids.split(',')]
-        selected = [v for v in BIBLE_VERSES_EN if v['id'] in id_list]
+        selected = [v for v in BIBLE_VERSES_SEO_EN if v['id'] in id_list]
     else:
-        # Random selection
-        selected = random.sample(BIBLE_VERSES_EN, min(count, len(BIBLE_VERSES_EN)))
+        # Random selection from all 30,923 verses
+        selected = random.sample(BIBLE_VERSES_SEO_EN, min(count, len(BIBLE_VERSES_SEO_EN)))
 
     return JSONResponse(content={"verses": selected})
 

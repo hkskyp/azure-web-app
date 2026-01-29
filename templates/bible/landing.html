@@ -15,11 +15,11 @@
 <meta property="og:description" content="Read inspiring daily Bible verses and test your memory with interactive quizzes. Free online Bible quotes to start your day.">
 {% endif %}
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}">
-<link rel="canonical" href="https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}">
-<link rel="alternate" hreflang="ko" href="https://lucasoft.ai.kr/bible-landing?lang=ko">
-<link rel="alternate" hreflang="en" href="https://lucasoft.ai.kr/bible-landing?lang=en">
-<link rel="alternate" hreflang="x-default" href="https://lucasoft.ai.kr/bible-landing?lang=en">
+<meta property="og:url" content="https://lucasoft.ai.kr/bible{% if lang == 'en' %}?lang=en{% endif %}">
+<link rel="canonical" href="https://lucasoft.ai.kr/bible{% if lang == 'en' %}?lang=en{% endif %}">
+<link rel="alternate" hreflang="ko" href="https://lucasoft.ai.kr/bible?lang=ko">
+<link rel="alternate" hreflang="en" href="https://lucasoft.ai.kr/bible?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://lucasoft.ai.kr/bible?lang=en">
 
 <!-- 구조화된 데이터 (Schema.org) - SEO 최적화: 전체 구절 크롤링 -->
 <script type="application/ld+json">
@@ -28,7 +28,7 @@
   "@type": "WebPage",
   "name": "{% if lang == 'ko' %}[lucasoft] | 매일 성경 구절{% else %}[lucasoft] | Inspiring Scripture{% endif %}",
   "description": "{% if lang == 'ko' %}매일 새로운 성경 구절을 읽고 퀴즈로 암기하세요{% else %}Read inspiring daily Bible verses and test your memory with interactive quizzes{% endif %}",
-  "url": "https://lucasoft.ai.kr/bible-landing{% if lang == 'en' %}?lang=en{% endif %}",
+  "url": "https://lucasoft.ai.kr/bible{% if lang == 'en' %}?lang=en{% endif %}",
   "inLanguage": "{{ lang }}",
   "hasPart": [
     {% for verse in all_verses %}
@@ -49,11 +49,55 @@
 
 {% block extra_css %}
 <style>
+/* ===== 점 패턴 배경 제거 ===== */
+.main-content::before {
+    display: none;
+}
+
+/* ===== 페이지 헤더 내 언어 전환 버튼 ===== */
+.page-header {
+    position: relative;
+    margin-bottom: 0;
+    padding-bottom: 1rem;
+}
+
+.page-header .lang-switcher {
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ===== 제품 컨테이너 여백 조정 ===== */
+.product-container {
+    padding-top: 0;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    color: var(--text-dark);
+}
+
+.lang-btn:hover {
+    background: var(--bg-light);
+}
+
+.lang-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
 /* ===== 앱 컨테이너 ===== */
 .bible-app {
-    min-height: calc(100vh - var(--header-height));
-    background-color: var(--bg-white);
-    overflow: hidden;
+    min-height: 400px;
 }
 
 /* ===== 로딩 화면 ===== */
@@ -118,65 +162,39 @@
 
 /* ===== 컨텐츠 컨테이너 ===== */
 .content-wrapper {
-    height: calc(100vh - var(--header-height));
+    height: 650px;
     position: relative;
 }
 
-/* ===== 헤더 ===== */
-.page-header {
-    text-align: center;
-    color: var(--text-dark);
-    padding: 2rem 1rem 1rem;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    background: linear-gradient(to bottom, var(--bg-white) 80%, transparent);
-}
-
-.page-header h1 {
-    font-size: 2rem;
-    margin-bottom: 0.25rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.page-header p {
-    font-size: 0.95rem;
-    color: var(--text-gray);
-}
-
-/* ===== 언어 전환 버튼 ===== */
-.lang-switcher {
-    position: fixed;
-    top: calc(var(--header-height) + 1rem);
-    right: 1rem;
+/* ===== 스크롤 컨테이너 (가로 스와이프) ===== */
+.scroll-container {
     display: flex;
-    gap: 0.5rem;
-    z-index: 200;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
-.lang-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border-color);
-    background: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    color: var(--text-dark);
+/* Hide scrollbar */
+.scroll-container::-webkit-scrollbar {
+    display: none;
 }
 
-.lang-btn:hover {
-    background: var(--bg-light);
+.scroll-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
-.lang-btn.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+/* ===== Slide (Card) ===== */
+.slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
 }
 
 /* ===== 스크롤 컨테이너 ===== */
@@ -187,7 +205,6 @@
     scroll-snap-type: x proximity;
     scroll-behavior: smooth;
     height: 100%;
-    padding-top: 100px;
     -webkit-overflow-scrolling: touch;
     scroll-padding: 0 2rem;
 }
@@ -219,8 +236,11 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    max-width: 600px;
-    width: 100%;
+    max-width: 700px;
+    width: 90%;
+    max-height: 580px;
+    display: flex;
+    flex-direction: column;
     transition: box-shadow 0.3s ease;
 }
 
@@ -233,17 +253,48 @@
     height: 300px;
     overflow: hidden;
     background: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
 }
 
 .verse-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.verse-image.no-image {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.verse-image.no-image::before {
+    content: '준비중';
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.verse-image.no-image::after {
+    content: 'Coming Soon';
+    font-size: 1.1rem;
+    color: var(--text-gray);
+    font-weight: 500;
 }
 
 .verse-content {
     padding: 2rem;
     text-align: center;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 .verse-number {
@@ -280,9 +331,9 @@
     padding: 2.5rem 2rem;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    max-width: 600px;
-    width: 100%;
-    max-height: calc(100vh - 200px);
+    max-width: 700px;
+    width: 90%;
+    max-height: 580px;
     overflow-y: auto;
 }
 
@@ -430,38 +481,6 @@
     box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
 }
 
-/* ===== 네비게이션 인디케이터 ===== */
-.nav-indicators {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 0.5rem;
-    z-index: 100;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 0.75rem 1.5rem;
-    border-radius: 20px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-}
-
-.nav-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--border-color);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.nav-dot.active {
-    background: var(--primary-color);
-    transform: scale(1.3);
-}
-
-.nav-dot:hover {
-    background: var(--primary-hover);
-}
 
 /* ===== 네비게이션 화살표 ===== */
 .nav-arrow {
@@ -504,39 +523,45 @@
 
 /* ===== 반응형 ===== */
 @media (max-width: 768px) {
-    .page-header h1 {
-        font-size: 1.5rem;
-    }
-
-    .page-header p {
-        font-size: 0.875rem;
-    }
-
-    .page-header {
-        padding: 1.5rem 1rem 0.75rem;
-    }
-
-    .lang-switcher {
-        top: calc(var(--header-height) + 0.5rem);
-        right: 0.5rem;
+    .page-header .lang-switcher {
+        position: static;
+        justify-content: center;
+        margin-bottom: 1rem;
     }
 
     .lang-btn {
         padding: 0.4rem 0.7rem;
         font-size: 0.75rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .scroll-container {
-        padding-top: 80px;
+    .content-wrapper {
+        height: 550px;
     }
 
     .slide {
         padding: 1rem;
     }
 
+    .verse-card {
+        width: 95%;
+        max-height: 480px;
+    }
+
+    .quiz-card {
+        width: 95%;
+        max-height: 480px;
+    }
+
     .verse-image {
         height: 200px;
+    }
+
+    .verse-image.no-image::before {
+        font-size: 1.5rem;
+    }
+
+    .verse-image.no-image::after {
+        font-size: 1rem;
     }
 
     .verse-text {
@@ -564,11 +589,6 @@
     .nav-arrow {
         display: none !important;
     }
-
-    .nav-indicators {
-        bottom: 1rem;
-        padding: 0.5rem 1rem;
-    }
 }
 
 /* ===== 숨김 처리 ===== */
@@ -579,45 +599,45 @@
 {% endblock %}
 
 {% block content %}
-<div id="bibleApp" class="bible-app">
-    <!-- 언어 전환 버튼 (항상 표시) -->
+<!-- 페이지 헤더 -->
+<div class="page-header">
+    <!-- 언어 전환 버튼 -->
     <div class="lang-switcher">
         <button class="lang-btn {% if lang == 'ko' %}active{% endif %}" data-lang="ko" onclick="App.switchLanguage('ko')">한국어</button>
         <button class="lang-btn {% if lang == 'en' %}active{% endif %}" data-lang="en" onclick="App.switchLanguage('en')">English</button>
     </div>
 
-    <!-- 로딩 화면 -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="spinner"></div>
-        <p>{% if lang == "ko" %}말씀을 준비하고 있습니다...{% else %}Preparing the Word...{% endif %}</p>
-    </div>
+    <h1 class="page-title">{% if lang == "ko" %}📖 오늘의 말씀{% else %}📖 Daily Bible Verses{% endif %}</h1>
+    <p class="page-description">{% if lang == "ko" %}하나님의 말씀으로 하루를 시작하세요{% else %}Start your day with God's Word{% endif %}</p>
+</div>
 
-    <!-- 에러 화면 -->
-    <div id="errorScreen" class="error-screen hidden">
-        <div class="error-icon">😔</div>
-        <p>{% if lang == "ko" %}말씀을 불러오는데 실패했습니다.{% else %}Failed to load verses.{% endif %}</p>
-        <button class="retry-btn" onclick="App.init()">{% if lang == "ko" %}다시 시도{% else %}Retry{% endif %}</button>
-    </div>
-
-    <!-- 컨텐츠 -->
-    <div id="contentWrapper" class="content-wrapper hidden">
-        <!-- 헤더 -->
-        <div class="page-header">
-            <h1>{% if lang == "ko" %}오늘의 말씀{% else %}Daily Bible Verses{% endif %}</h1>
-            <p>{% if lang == "ko" %}하나님의 말씀으로 하루를 시작하세요{% else %}Start your day with God's Word{% endif %}</p>
+<!-- 제품 컨테이너 -->
+<div class="product-container">
+    <div id="bibleApp" class="bible-app">
+        <!-- 로딩 화면 -->
+        <div id="loadingScreen" class="loading-screen">
+            <div class="spinner"></div>
+            <p>{% if lang == "ko" %}말씀을 준비하고 있습니다...{% else %}Preparing the Word...{% endif %}</p>
         </div>
 
-        <!-- 스크롤 컨테이너 -->
-        <div id="scrollContainer" class="scroll-container">
-            <!-- 구절 슬라이드들이 여기에 동적으로 추가됨 -->
+        <!-- 에러 화면 -->
+        <div id="errorScreen" class="error-screen hidden">
+            <div class="error-icon">😔</div>
+            <p>{% if lang == "ko" %}말씀을 불러오는데 실패했습니다.{% else %}Failed to load verses.{% endif %}</p>
+            <button class="retry-btn" onclick="App.init()">{% if lang == "ko" %}다시 시도{% else %}Retry{% endif %}</button>
         </div>
 
-        <!-- 네비게이션 화살표 -->
-        <div id="navLeft" class="nav-arrow left hidden" onclick="App.navigate(-1)">‹</div>
-        <div id="navRight" class="nav-arrow right" onclick="App.navigate(1)">›</div>
+        <!-- 컨텐츠 -->
+        <div id="contentWrapper" class="content-wrapper hidden">
+            <!-- 스크롤 컨테이너 (가로 스와이프) -->
+            <div id="scrollContainer" class="scroll-container">
+                <!-- 구절 슬라이드들이 여기에 동적으로 추가됨 -->
+            </div>
 
-        <!-- 네비게이션 인디케이터 -->
-        <div id="navIndicators" class="nav-indicators"></div>
+            <!-- 네비게이션 화살표 -->
+            <div id="navLeft" class="nav-arrow left hidden" onclick="App.navigate(-1)">‹</div>
+            <div id="navRight" class="nav-arrow right" onclick="App.navigate(1)">›</div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -687,8 +707,7 @@ const App = {
             contentWrapper: document.getElementById('contentWrapper'),
             scrollContainer: document.getElementById('scrollContainer'),
             navLeft: document.getElementById('navLeft'),
-            navRight: document.getElementById('navRight'),
-            navIndicators: document.getElementById('navIndicators')
+            navRight: document.getElementById('navRight')
         };
     },
 
@@ -817,10 +836,10 @@ const App = {
             slide.className = 'slide';
             slide.innerHTML = `
                 <div class="verse-card">
-                    <div class="verse-image">
+                    <div class="verse-image" id="verseImage${index}">
                         <img src="/static/images/bible/${verse.image}"
                              alt="${verse.reference.book} ${verse.reference.chapter}:${verse.reference.verse}"
-                             onerror="this.src='/static/images/bible/placeholder.webp'">
+                             onerror="this.style.display='none'; document.getElementById('verseImage${index}').classList.add('no-image');">
                     </div>
                     <div class="verse-content">
                         <div class="verse-number">${index + 1}</div>
@@ -874,7 +893,12 @@ const App = {
     renderQuiz: function() {
         const verse = this.state.quizVerse;
         let text = verse.text;
-        const blindWords = verse.blind_words || [];
+
+        // blind_words가 비어있으면 자동 생성
+        let blindWords = verse.blind_words || [];
+        if (blindWords.length === 0) {
+            blindWords = this.generateBlindWords(text);
+        }
 
         const sortedWords = [...blindWords].sort((a, b) => b.length - a.length);
         const replacements = [];
@@ -917,17 +941,43 @@ const App = {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     },
 
-    // ===== 네비게이션 설정 =====
-    setupNavigation: function() {
-        // 인디케이터 생성
-        this.elements.navIndicators.innerHTML = '';
-        for (let i = 0; i < this.state.totalSlides; i++) {
-            const dot = document.createElement('div');
-            dot.className = `nav-dot ${i === 0 ? 'active' : ''}`;
-            dot.onclick = () => this.scrollToSlide(i);
-            this.elements.navIndicators.appendChild(dot);
+    // ===== 자동 blind_words 생성 =====
+    generateBlindWords: function(text) {
+        // 구두점 제거하고 단어 추출
+        const words = text.replace(/[.,!?'"]/g, '').split(/\s+/);
+
+        // 3글자 이상 단어만 선택
+        const candidates = words.filter(word => {
+            // 한글: 2글자 이상, 영어: 4글자 이상
+            const isKorean = /[가-힣]/.test(word);
+            return isKorean ? word.length >= 2 : word.length >= 4;
+        });
+
+        // 중복 제거
+        const uniqueCandidates = [...new Set(candidates)];
+
+        // 전체 단어의 20-30%만 선택 (최소 2개, 최대 4개)
+        const totalWords = words.length;
+        const maxBlindWords = Math.min(4, Math.ceil(totalWords * 0.3));
+        const minBlindWords = Math.min(2, uniqueCandidates.length);
+        const count = Math.min(
+            Math.max(minBlindWords, Math.floor(Math.random() * 2) + 2),
+            maxBlindWords,
+            uniqueCandidates.length
+        );
+
+        const selected = [];
+        const shuffled = [...uniqueCandidates].sort(() => Math.random() - 0.5);
+
+        for (let i = 0; i < count; i++) {
+            selected.push(shuffled[i]);
         }
 
+        return selected;
+    },
+
+    // ===== 네비게이션 설정 =====
+    setupNavigation: function() {
         // 스크롤 이벤트 리스너
         this.elements.scrollContainer.addEventListener('scroll', () => {
             this.updateNavigation();
@@ -945,11 +995,46 @@ const App = {
 
         this.state.currentSlide = currentSlide;
 
-        // 인디케이터 업데이트
-        const dots = this.elements.navIndicators.querySelectorAll('.nav-dot');
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentSlide);
+        // 화살표 표시/숨김
+        this.elements.navLeft.classList.toggle('hidden', currentSlide === 0);
+        this.elements.navRight.classList.toggle('hidden', currentSlide === this.state.totalSlides - 1);
+    },
+
+    // ===== 네비게이트 =====
+    navigate: function(direction) {
+        const newSlide = this.state.currentSlide + direction;
+        if (newSlide >= 0 && newSlide < this.state.totalSlides) {
+            this.scrollToSlide(newSlide);
+        }
+    },
+
+    scrollToSlide: function(index) {
+        const container = this.elements.scrollContainer;
+        const slideWidth = container.clientWidth;
+        container.scrollTo({
+            left: slideWidth * index,
+            behavior: 'smooth'
         });
+    },
+
+    // ===== 네비게이션 설정 =====
+    setupNavigation: function() {
+        // 스크롤 이벤트 리스너
+        this.elements.scrollContainer.addEventListener('scroll', () => {
+            this.updateNavigation();
+        });
+
+        this.updateNavigation();
+    },
+
+    // ===== 네비게이션 업데이트 =====
+    updateNavigation: function() {
+        const container = this.elements.scrollContainer;
+        const slideWidth = container.clientWidth;
+        const scrollLeft = container.scrollLeft;
+        const currentSlide = Math.round(scrollLeft / slideWidth);
+
+        this.state.currentSlide = currentSlide;
 
         // 화살표 표시/숨김
         this.elements.navLeft.classList.toggle('hidden', currentSlide === 0);
