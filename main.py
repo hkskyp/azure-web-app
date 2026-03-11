@@ -10,6 +10,8 @@ from data.certificates import CERTIFICATES
 from data.bible_verses import BIBLE_VERSES
 from data.bible_verses_en import BIBLE_VERSES_EN
 from data.bible_verses_seo import BIBLE_VERSES_SEO_KO, BIBLE_VERSES_SEO_EN
+import tracking
+from tracking_routes import router as tracking_router
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -29,6 +31,14 @@ templates = Jinja2Templates(directory="templates")
 templates.env.globals["current_year"] = datetime.now().year
 
 converter = CoordinateConverter()
+
+# Video Tracking 라우터
+app.include_router(tracking_router)
+
+@app.on_event("startup")
+async def startup_event():
+    tracking.init_db()
+    tracking.retry_unsynced()
 
 @app.get("/")
 async def root():

@@ -1,0 +1,109 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    background: #0a0a0a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.watch-header {
+    background: #1a1a2e;
+    padding: 12px 24px;
+    text-align: center;
+}
+
+.banner-placeholder {
+    color: #888;
+    font-size: 14px;
+}
+
+.watch-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    gap: 20px;
+}
+
+.video-container {
+    width: 100%;
+    max-width: 960px;
+}
+
+.video-container video {
+    width: 100%;
+    border-radius: 8px;
+    background: #000;
+}
+
+.controls-container {
+    width: 100%;
+    max-width: 960px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.progress-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progress-bar-wrapper {
+    flex: 1;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #4f46e5;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 14px;
+    color: #ccc;
+    min-width: 48px;
+    text-align: right;
+}
+
+.complete-btn {
+    padding: 10px 24px;
+    background: #4f46e5;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.complete-btn:hover { background: #4338ca; }
+.complete-btn:disabled { background: #555; cursor: not-allowed; }
+
+.watch-footer {
+    background: #1a1a2e;
+    padding: 12px 24px;
+    text-align: center;
+}
+
+.footer-placeholder {
+    color: #888;
+    font-size: 12px;
+}
+
+@media (max-width: 640px) {
+    .controls-container { flex-direction: column; }
+    .watch-main { padding: 12px; }
+}

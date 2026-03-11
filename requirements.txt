@@ -7,3 +7,4 @@ mgrs>=1.4.0
 utm>=0.7.0
 packaging>=25.0
 gunicorn>=23.0.0
+notion-client>=2.0.0

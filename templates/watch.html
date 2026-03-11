@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동영상 시청</title>
+    <link rel="stylesheet" href="/static/css/watch.css">
+</head>
+<body>
+    <!-- 헤더 배너 (추후 내용 교체) -->
+    <header class="watch-header">
+        <div class="banner-placeholder">배너 영역</div>
+    </header>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="watch-main">
+        <div class="video-container">
+            <video id="videoPlayer" controls preload="metadata">
+                <source src="{{ stream_url }}" type="video/mp4">
+                브라우저가 동영상을 지원하지 않습니다.
+            </video>
+        </div>
+
+        <div class="controls-container">
+            <div class="progress-info">
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar" id="progressBar" style="width: {{ progress }}%"></div>
+                </div>
+                <span class="progress-text" id="progressText">{{ progress }}%</span>
+            </div>
+            <button class="complete-btn" id="completeBtn"
+                {% if is_completed %}disabled{% endif %}>
+                {% if is_completed %}완료됨{% else %}수강 완료{% endif %}
+            </button>
+        </div>
+    </main>
+
+    <!-- 푸터 (추후 내용 교체) -->
+    <footer class="watch-footer">
+        <div class="footer-placeholder">푸터 영역</div>
+    </footer>
+
+    <script>
+        window.__WATCH_CONFIG = {
+            pageId: "{{ page_id }}",
+            currentPosition: {{ current_position }},
+            progress: {{ progress }},
+            watchedSeconds: {{ watched_seconds }},
+            isCompleted: {{ "true" if is_completed else "false" }},
+        };
+    </script>
+    <script src="/static/js/watch.js"></script>
+</body>
+</html>
