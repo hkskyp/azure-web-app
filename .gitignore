@@ -210,6 +210,18 @@ __marimo__/
 # Claude Code - local settings only
 .claude/settings.local.json
 
+# Serena
+.serena/
+
+# Docs (specs, plans)
+docs/superpowers/
+
+# Tracking DB & debug files
+data/tracking.db
+data/tracking.db-wal
+data/tracking.db-shm
+data/*_debug.json
+
 # Windows temporary files
 nul
 
