@@ -97,7 +97,7 @@ async def tracking_progress(request: Request, background_tasks: BackgroundTasks)
     progress = tracking.upsert_progress(page_id, current_position, duration, watched_seconds)
     background_tasks.add_task(
         tracking.sync_to_notion, page_id,
-        tracking.build_notion_progress_properties(progress, watched_seconds)
+        tracking.build_notion_progress_properties(progress, watched_seconds, duration)
     )
 
     return JSONResponse({"status": "ok", "progress": round(progress, 1)})
@@ -125,7 +125,7 @@ async def tracking_complete(request: Request, background_tasks: BackgroundTasks)
     watch_end, progress = tracking.upsert_complete(page_id, current_position, duration, watched_seconds)
     background_tasks.add_task(
         tracking.sync_to_notion, page_id,
-        tracking.build_notion_complete_properties(watch_end, progress, watched_seconds)
+        tracking.build_notion_complete_properties(watch_end, progress, watched_seconds, duration)
     )
 
     return JSONResponse({"status": "completed", "progress": round(progress, 1)})
@@ -143,11 +143,14 @@ async def tracking_refresh(id: str):
     watched_seconds = log["watched_seconds"] or 0
     watched_minutes = round(watched_seconds / 60, 1)
     progress = round(log["progress"], 1)
+    duration = log["duration"] or 0
+    duration_minutes = round(duration / 60, 1)
 
     try:
         tracking.sync_to_notion(id, {
             "시청시간(분)": {"number": watched_minutes},
             "진도율": {"number": round(progress / 100, 3)},
+            "동영상길이(분)": {"number": duration_minutes},
         })
         result = f"시청시간(분): {watched_minutes}분 / 진도율: {progress}% 갱신 완료"
     except Exception:

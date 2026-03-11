@@ -184,18 +184,20 @@ def build_notion_start_properties(watch_start: str) -> dict:
     }
 
 
-def build_notion_progress_properties(progress: float, watched_seconds: float) -> dict:
+def build_notion_progress_properties(progress: float, watched_seconds: float, duration: float) -> dict:
     return {
         "진도율": {"number": round(progress / 100, 3)},
-        "시청시간(분)": {"number": round(watched_seconds / 60, 1)}
+        "시청시간(분)": {"number": round(watched_seconds / 60, 1)},
+        "동영상길이(분)": {"number": round(duration / 60, 1)}
     }
 
 
-def build_notion_complete_properties(watch_end: str, progress: float, watched_seconds: float) -> dict:
+def build_notion_complete_properties(watch_end: str, progress: float, watched_seconds: float, duration: float) -> dict:
     return {
         "시청종료시간": {"date": {"start": watch_end}},
         "진도율": {"number": round(progress / 100, 3)},
-        "시청시간(분)": {"number": round(watched_seconds / 60, 1)}
+        "시청시간(분)": {"number": round(watched_seconds / 60, 1)},
+        "동영상길이(분)": {"number": round(duration / 60, 1)}
     }
 
 
@@ -208,10 +210,10 @@ def retry_unsynced():
                 props.update(build_notion_start_properties(log["watch_start"]))
             if log.get("watch_end"):
                 props.update(
-                    build_notion_complete_properties(log["watch_end"], log["progress"], log.get("watched_seconds", 0))
+                    build_notion_complete_properties(log["watch_end"], log["progress"], log.get("watched_seconds", 0), log.get("duration", 0))
                 )
             elif log.get("progress"):
-                props.update(build_notion_progress_properties(log["progress"], log.get("watched_seconds", 0)))
+                props.update(build_notion_progress_properties(log["progress"], log.get("watched_seconds", 0), log.get("duration", 0)))
             if props:
                 sync_to_notion(log["page_id"], props)
         except Exception as e:
