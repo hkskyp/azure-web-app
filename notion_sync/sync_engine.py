@@ -239,13 +239,16 @@ _SYNC_ID_PROP = {"_sync_id": {"rich_text": {}}}
 
 def create_student_individual_dbs(student_page_id: str, student_name: str):
     """Create 3 individual DBs under a new student page."""
-    r1 = _create_db(f"{student_name} 수강목록", student_page_id, _ENROLLMENT_SCHEMA, "🔗")
-    notion.databases.update(database_id=r1["id"], properties=_SYNC_ID_PROP)
-    r2 = _create_db(f"{student_name} 과제",     student_page_id, _ASSIGNMENT_SCHEMA,  "📝")
-    notion.databases.update(database_id=r2["id"], properties=_SYNC_ID_PROP)
-    r3 = _create_db(f"{student_name} 학습일지", student_page_id, _STUDY_LOG_SCHEMA,   "📖")
-    notion.databases.update(database_id=r3["id"], properties=_SYNC_ID_PROP)
-    logger.info(f"Created 3 individual DBs for student: {student_name}")
+    try:
+        r1 = _create_db(f"{student_name} 수강목록", student_page_id, _ENROLLMENT_SCHEMA, "🔗")
+        notion.databases.update(database_id=r1["id"], properties=_SYNC_ID_PROP)
+        r2 = _create_db(f"{student_name} 과제",     student_page_id, _ASSIGNMENT_SCHEMA,  "📝")
+        notion.databases.update(database_id=r2["id"], properties=_SYNC_ID_PROP)
+        r3 = _create_db(f"{student_name} 학습일지", student_page_id, _STUDY_LOG_SCHEMA,   "📖")
+        notion.databases.update(database_id=r3["id"], properties=_SYNC_ID_PROP)
+        logger.info(f"Created 3 individual DBs for student: {student_name}")
+    except Exception as e:
+        logger.error(f"Failed to create individual DBs for {student_name} ({student_page_id}): {e}")
 
 
 def _find_by_sync_id(db_id: str, sync_id: str) -> str | None:

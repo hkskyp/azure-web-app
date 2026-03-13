@@ -46,38 +46,46 @@ def init(notion_token: str, config_db_id: str = None):
         sync_engine.shared_parent_db_id = SHARED_DB_IDS.get("parent", "")
 
 
-def _identify_source(payload: dict) -> tuple[str, str]:
-    """Identify source DB type and page_id from webhook payload."""
-    page_id = payload.get("id", "")
-    parent = payload.get("parent", {})
-    db_id = parent.get("database_id", "")
+def _get_db_id(page: dict) -> str:
+    return page.get("parent", {}).get("database_id", "")
 
-    # Check shared DBs first (O(1), no API call)
+
+def _identify_source_from_page(page: dict) -> str:
+    """Identify source DB type from a full Notion page object."""
+    db_id = _get_db_id(page)
+    if not db_id:
+        return "unknown"
+
     for db_type, sid in SHARED_DB_IDS.items():
         if sid and db_id.replace("-", "") == sid.replace("-", ""):
-            return db_type, page_id
+            return db_type
 
-    # Identify individual DB type via Notion API
     result = sync_engine.get_db_type_from_id(db_id)
-    if result:
-        return result[0], page_id
-
-    return "unknown", page_id
-
+    return result[0] if result else "unknown"
 
 
 @router.post("/notion")
 async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
     """Handle Notion automation webhook."""
     payload = await request.json()
-    logger.info(f"Webhook received: {list(payload.keys())}")
+    page_id = payload.get("id", "")
+    logger.info(f"Webhook received, page_id={page_id}")
 
-    source_type, page_id = _identify_source(payload)
+    if not page_id:
+        return {"status": "ignored", "reason": "no page_id"}
+
+    # Notion 자동화 webhook payload는 내용이 불완전할 수 있으므로 API로 직접 조회
+    try:
+        page = sync_engine.notion.pages.retrieve(page_id)
+    except Exception as e:
+        logger.error(f"Failed to retrieve page {page_id}: {e}")
+        return {"status": "error", "reason": str(e)}
+
+    source_type = _identify_source_from_page(page)
     logger.info(f"Source: {source_type}, page: {page_id}")
 
     if source_type == "student":
-        props = payload.get("properties", {})
-        name_prop = props.get("이름", {})
+        name_prop = page.get("properties", {}).get("이름", {})
         student_name = "".join(
             t.get("plain_text", "") for t in name_prop.get("title", [])
         )
@@ -90,20 +98,20 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
     if source_type in ("enrollment", "assignment", "payment"):
         background_tasks.add_task(
             sync_engine.sync_shared_to_individual,
-            source_type, page_id, payload)
+            source_type, page_id, page)
         return {"status": "accepted", "direction": "shared→individual"}
 
     elif source_type == "individual_study_log":
         background_tasks.add_task(
             sync_engine.sync_individual_to_shared,
-            "study_log", page_id, payload,
+            "study_log", page_id, page,
             SHARED_DB_IDS.get("study_log", ""))
         return {"status": "accepted", "direction": "individual→shared"}
 
     elif source_type == "individual_assignment":
         background_tasks.add_task(
             sync_engine.sync_individual_to_shared,
-            "assignment_submission", page_id, payload,
+            "assignment_submission", page_id, page,
             SHARED_DB_IDS.get("assignment", ""))
         return {"status": "accepted", "direction": "individual→shared"}
 
