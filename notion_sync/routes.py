@@ -69,7 +69,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
     """Handle Notion automation webhook."""
     payload = await request.json()
     page_id = payload.get("id", "")
-    logger.info(f"Webhook received, page_id={page_id}")
+    logger.warning(f"Webhook received, page_id={page_id}")
 
     if not page_id:
         return {"status": "ignored", "reason": "no page_id"}
@@ -82,7 +82,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
         return {"status": "error", "reason": str(e)}
 
     source_type = _identify_source_from_page(page)
-    logger.info(f"Source: {source_type}, page: {page_id}")
+    logger.warning(f"Source: {source_type}, page: {page_id}")
 
     if source_type == "student":
         name_prop = page.get("properties", {}).get("이름", {})

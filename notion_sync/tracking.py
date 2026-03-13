@@ -17,7 +17,7 @@ def fetch_dropbox_url(page_id: str) -> str | None:
     client = get_notion_client()
     page = client.pages.retrieve(page_id=page_id)
     props = page.get("properties", {})
-    url_prop = props.get("url", {})
+    url_prop = props.get("영상URL", {})
 
     # 직접 URL 속성인 경우
     if url_prop.get("type") == "url":
