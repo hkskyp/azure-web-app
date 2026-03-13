@@ -42,8 +42,6 @@ app.include_router(sync_router)
 
 @app.on_event("startup")
 async def startup_event():
-    tracking.init_db()
-    tracking.retry_unsynced()
     # Initialize Notion sync
     notion_token = os.environ.get("NOTION_API_KEY", "")
     if notion_token:

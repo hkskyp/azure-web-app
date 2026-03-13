@@ -1,9 +1,34 @@
 """Core sync logic: route webhook events to correct handler."""
 
 import logging
+import os
+
+import httpx
 from notion_client import Client
 
 from . import schema_map
+
+_NOTION_API_BASE = "https://api.notion.com/v1"
+_NOTION_VERSION = "2022-06-28"
+
+
+def _query_database(db_id: str, filter: dict = None) -> dict:
+    """Query a Notion database via direct HTTP (bypasses notion-client version issues)."""
+    token = os.environ.get("NOTION_API_KEY", "")
+    body = {}
+    if filter:
+        body["filter"] = filter
+    resp = httpx.post(
+        f"{_NOTION_API_BASE}/databases/{db_id}/query",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Notion-Version": _NOTION_VERSION,
+        },
+        json=body,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    return resp.json()
 
 logger = logging.getLogger("notion_sync")
 
@@ -45,8 +70,8 @@ def _get_parent_payment_dbs(student_page_id: str) -> list[str]:
     if not shared_parent_db_id:
         logger.warning("SHARED_PARENT_DB_ID not set; skipping payment sync")
         return []
-    resp = notion.databases.query(
-        database_id=shared_parent_db_id,
+    resp = _query_database(
+        shared_parent_db_id,
         filter={"property": "자녀", "relation": {"contains": student_page_id}},
     )
     payment_dbs = []
@@ -224,8 +249,8 @@ def create_student_individual_dbs(student_page_id: str, student_name: str):
 
 
 def _find_by_sync_id(db_id: str, sync_id: str) -> str | None:
-    result = notion.databases.query(
-        database_id=db_id,
+    result = _query_database(
+        db_id,
         filter={"property": "_sync_id", "rich_text": {"equals": sync_id}},
     )
     pages = result.get("results", [])

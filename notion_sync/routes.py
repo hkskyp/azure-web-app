@@ -25,7 +25,7 @@ _CONFIG_KEY_MAP = {
 def _load_config(config_db_id: str):
     """Query Notion config DB and populate SHARED_DB_IDS."""
     try:
-        resp = sync_engine.notion.databases.query(database_id=config_db_id)
+        resp = sync_engine._query_database(config_db_id)
         for page in resp.get("results", []):
             props = page.get("properties", {})
             key = "".join(t["plain_text"] for t in props.get("설정명", {}).get("title", []))
@@ -63,6 +63,7 @@ def _identify_source(payload: dict) -> tuple[str, str]:
         return result[0], page_id
 
     return "unknown", page_id
+
 
 
 @router.post("/notion")
