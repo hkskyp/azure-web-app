@@ -43,10 +43,10 @@ async def watch_page(request: Request, id: str, background_tasks: BackgroundTask
 
     stream_url = tracking.convert_dropbox_url(dropbox_url)
     log = tracking.get_watch_log(id)
-    current_position = log["current_position"] if log else 0
-    progress = log["progress"] if log else 0
-    watched_seconds = log["watched_seconds"] if log and log["watched_seconds"] else 0
-    is_completed = bool(log["watch_end"]) if log else False
+    current_position = log.get("current_position") or 0 if log else 0
+    progress = log.get("progress") or 0 if log else 0
+    watched_seconds = log.get("watched_seconds") or 0 if log else 0
+    is_completed = bool(log.get("watch_end")) if log else False
 
     watch_start = tracking.upsert_watch_start(id)
     background_tasks.add_task(
@@ -140,10 +140,10 @@ async def tracking_refresh(id: str):
     if not log:
         return HTMLResponse("<h1>시청 기록이 없습니다.</h1>", status_code=404)
 
-    watched_seconds = log["watched_seconds"] or 0
+    watched_seconds = log.get("watched_seconds") or 0
     watched_minutes = round(watched_seconds / 60, 1)
-    progress = round(log["progress"], 1)
-    duration = log["duration"] or 0
+    progress = round(log.get("progress") or 0, 1)
+    duration = log.get("duration") or 0
     duration_minutes = round(duration / 60, 1)
 
     try:
