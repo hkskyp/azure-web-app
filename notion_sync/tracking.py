@@ -81,9 +81,10 @@ def fetch_watch_state(page_id: str) -> dict | None:
         progress_ratio = (props.get("진도율") or {}).get("number") or 0
         watch_end_date = (props.get("시청종료시간") or {}).get("date") or {}
 
+        duration_seconds = duration_minutes * 60
         return {
-            "current_position": watched_minutes * 60,
-            "duration": duration_minutes * 60,
+            "current_position": progress_ratio * duration_seconds,
+            "duration": duration_seconds,
             "progress": round(progress_ratio * 100, 1),
             "watched_seconds": watched_minutes * 60,
             "watch_end": watch_end_date.get("start"),

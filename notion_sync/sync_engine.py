@@ -308,16 +308,22 @@ def sync_shared_to_individual(source_db_type: str, page_id: str, page_data: dict
         map_fn = schema_map.shared_enrollment_to_individual if source_db_type == "enrollment" \
             else schema_map.shared_assignment_to_individual
 
-        # enrollment인 경우 수업영상 relation에서 영상 정보 resolve
-        video_kwargs = {}
+        # relation 속성에서 추가 정보 resolve
+        extra_kwargs = {}
         if source_db_type == "enrollment":
             video_ids = props.get("수업영상", []) or []
             if video_ids:
                 try:
-                    video_info = _resolve_video_info(video_ids[0])
-                    video_kwargs = video_info
+                    extra_kwargs = _resolve_video_info(video_ids[0])
                 except Exception as e:
                     logger.warning(f"Failed to resolve video info: {e}")
+        elif source_db_type == "assignment":
+            subject_ids = props.get("과목", []) or []
+            if subject_ids:
+                try:
+                    extra_kwargs["subject_name"] = _resolve_page_title(subject_ids[0])
+                except Exception as e:
+                    logger.warning(f"Failed to resolve subject name: {e}")
 
         for stu_page_id in student_page_ids:
             child_dbs = _get_student_child_dbs(stu_page_id)
@@ -325,7 +331,7 @@ def sync_shared_to_individual(source_db_type: str, page_id: str, page_data: dict
             if not target_db:
                 logger.warning(f"No {type_key} DB found under student {stu_page_id}")
                 continue
-            mapped = map_fn(props, sync_id=page_id, **video_kwargs)
+            mapped = map_fn(props, sync_id=page_id, **extra_kwargs)
             notion_props = _build_notion_props(mapped, prop_types)
             existing = _find_by_sync_id(target_db, page_id)
             if existing:
@@ -347,6 +353,15 @@ def sync_shared_to_individual(source_db_type: str, page_id: str, page_data: dict
                 else:
                     notion.pages.create(parent={"database_id": target_db}, properties=notion_props)
             logger.info(f"Synced payment to parents of student {stu_page_id}")
+
+
+def _resolve_page_title(page_id: str) -> str:
+    """페이지의 title 속성에서 이름을 가져온다."""
+    page = notion.pages.retrieve(page_id)
+    for v in page.get("properties", {}).values():
+        if v.get("type") == "title":
+            return "".join(t.get("plain_text", "") for t in v.get("title", []))
+    return ""
 
 
 def _resolve_video_info(video_page_id: str) -> dict:

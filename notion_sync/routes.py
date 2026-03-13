@@ -57,8 +57,9 @@ def _identify_source_from_page(page: dict) -> str:
     if not db_id:
         return "unknown"
 
+    db_id_clean = db_id.replace("-", "")
     for db_type, sid in SHARED_DB_IDS.items():
-        if sid and db_id.replace("-", "") == sid.replace("-", ""):
+        if sid and db_id_clean == sid.replace("-", ""):
             return db_type
 
     result = sync_engine.get_db_type_from_id(db_id)
