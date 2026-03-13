@@ -1,5 +1,7 @@
+import json
 import os
 import logging
+import subprocess
 from datetime import datetime, timezone
 
 from notion_client import Client as NotionClient
@@ -36,6 +38,27 @@ def fetch_dropbox_url(page_id: str) -> str | None:
         return None
 
     return None
+
+
+def probe_video_duration(url: str) -> float | None:
+    """ffprobe로 영상 길이(초) 추출. ffprobe 없으면 None."""
+    try:
+        result = subprocess.run(
+            ["ffprobe", "-v", "quiet", "-print_format", "json",
+             "-show_format", url],
+            capture_output=True, text=True, timeout=30,
+        )
+        if result.returncode != 0:
+            logger.warning(f"ffprobe failed: {result.stderr[:200]}")
+            return None
+        data = json.loads(result.stdout)
+        return float(data["format"]["duration"])
+    except FileNotFoundError:
+        logger.error("ffprobe not installed")
+        return None
+    except Exception as e:
+        logger.error(f"probe_video_duration failed: {e}")
+        return None
 
 
 def convert_dropbox_url(url: str) -> str:
@@ -94,8 +117,19 @@ def upsert_complete(page_id: str, current_position: float, duration: float, watc
 def sync_to_notion(page_id: str, properties: dict):
     try:
         client = get_notion_client()
+        # 개별 수강목록 페이지 업데이트
         client.pages.update(page_id=page_id, properties=properties)
         logger.info(f"Notion synced: {page_id}")
+
+        # _sync_id가 있으면 공유 수강목록 페이지도 업데이트
+        page = client.pages.retrieve(page_id=page_id)
+        sync_id_prop = page.get("properties", {}).get("_sync_id", {})
+        sync_id = "".join(
+            t.get("plain_text", "") for t in sync_id_prop.get("rich_text", [])
+        )
+        if sync_id:
+            client.pages.update(page_id=sync_id, properties=properties)
+            logger.info(f"Shared synced: {sync_id}")
     except Exception as e:
         logger.error(f"Notion sync failed for {page_id}: {e}")
 

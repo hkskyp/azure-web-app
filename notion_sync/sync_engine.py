@@ -186,6 +186,9 @@ _ENROLLMENT_SCHEMA = {
     "시청완료": {"formula": {
         "expression": 'if(prop("진도율") >= 0.9, "✅ 완료", "⬜ 미완료")',
     }},
+    "시청시간 조회": {"formula": {
+        "expression": 'link("🔄 조회", "https://lucasoft.ai.kr/api/webhook/tracking/refresh?id=" + id())',
+    }},
     "배정일": {"date": {}},
     "진도율": {"number": {"format": "percent"}},
     "시청시작시간": {"date": {}},

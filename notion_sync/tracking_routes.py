@@ -131,34 +131,64 @@ async def tracking_complete(request: Request, background_tasks: BackgroundTasks)
     return JSONResponse({"status": "completed", "progress": round(progress, 1)})
 
 
-@router.get("/api/webhook/tracking/refresh", response_class=HTMLResponse)
+@router.get("/api/webhook/tracking/refresh")
 async def tracking_refresh(id: str):
+    """학생별 수강목록 → 시청시간/진도율만 갱신."""
     if not id or not validate_page_id(id):
-        return HTMLResponse("<h1>잘못된 요청입니다.</h1>", status_code=400)
+        return JSONResponse({"error": "invalid id"}, status_code=400)
 
     log = tracking.get_watch_log(id)
     if not log:
-        return HTMLResponse("<h1>시청 기록이 없습니다.</h1>", status_code=404)
+        return JSONResponse({"error": "no watch log"}, status_code=404)
 
     watched_seconds = log["watched_seconds"] or 0
     watched_minutes = round(watched_seconds / 60, 1)
     progress = round(log["progress"], 1)
-    duration = log["duration"] or 0
-    duration_minutes = round(duration / 60, 1)
 
     try:
         tracking.sync_to_notion(id, {
             "시청시간(분)": {"number": watched_minutes},
             "진도율": {"number": round(progress / 100, 3)},
+        })
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+    return JSONResponse({
+        "status": "ok",
+        "시청시간(분)": watched_minutes,
+        "진도율": progress,
+    })
+
+
+@router.get("/api/webhook/video/duration")
+async def video_duration(id: str):
+    """수업영상 DB → 동영상길이(분)만 갱신. 영상 메타데이터에서 길이 추출."""
+    if not id or not validate_page_id(id):
+        return JSONResponse({"error": "invalid id"}, status_code=400)
+
+    try:
+        dropbox_url = tracking.fetch_dropbox_url(id)
+    except Exception:
+        return JSONResponse({"error": "영상 정보 조회 실패"}, status_code=404)
+
+    if not dropbox_url:
+        return JSONResponse({"error": "영상 URL 없음"}, status_code=404)
+
+    stream_url = tracking.convert_dropbox_url(dropbox_url)
+    duration = tracking.probe_video_duration(stream_url)
+    if duration is None:
+        return JSONResponse({"error": "영상 길이 감지 실패"}, status_code=500)
+
+    duration_minutes = round(duration / 60, 1)
+    try:
+        client = tracking.get_notion_client()
+        client.pages.update(page_id=id, properties={
             "동영상길이(분)": {"number": duration_minutes},
         })
-        result = f"시청시간(분): {watched_minutes}분 / 진도율: {progress}% 갱신 완료"
-    except Exception:
-        result = "Notion 갱신에 실패했습니다."
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
 
-    return HTMLResponse(f"""<!DOCTYPE html>
-<html lang="ko"><head><meta charset="UTF-8"><title>시청시간 갱신</title>
-<style>body{{font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;background:#0a0a0a;color:#fff;margin:0}}
-.card{{background:#1a1a2e;padding:32px 48px;border-radius:12px;text-align:center}}
-h2{{margin:0 0 16px}}p{{color:#ccc;margin:0}}</style></head>
-<body><div class="card"><h2>{result}</h2><p>이 창을 닫아도 됩니다.</p></div></body></html>""")
+    return JSONResponse({
+        "status": "ok",
+        "동영상길이(분)": duration_minutes,
+    })
