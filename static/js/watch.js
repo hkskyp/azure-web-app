@@ -88,7 +88,7 @@
             duration: video.duration,
             watched_seconds: getTotalWatched(),
         };
-        fetch("/api/tracking/progress", {
+        fetch("/api/webhook/tracking/progress", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
@@ -116,7 +116,7 @@
             duration: video.duration,
             watched_seconds: getTotalWatched(),
         };
-        fetch("/api/tracking/complete", {
+        fetch("/api/webhook/tracking/complete", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
@@ -166,7 +166,7 @@
             duration: video.duration,
             watched_seconds: getTotalWatched(),
         });
-        navigator.sendBeacon("/api/tracking/progress", data);
+        navigator.sendBeacon("/api/webhook/tracking/progress", data);
     }
 
     window.addEventListener("pagehide", sendBeaconProgress);

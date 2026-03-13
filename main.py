@@ -10,8 +10,10 @@ from data.certificates import CERTIFICATES
 from data.bible_verses import BIBLE_VERSES
 from data.bible_verses_en import BIBLE_VERSES_EN
 from data.bible_verses_seo import BIBLE_VERSES_SEO_KO, BIBLE_VERSES_SEO_EN
-import tracking
-from tracking_routes import router as tracking_router
+import os
+from notion_sync import tracking
+from notion_sync.tracking_routes import router as tracking_router
+from notion_sync.routes import router as sync_router, init as init_sync
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -35,10 +37,20 @@ converter = CoordinateConverter()
 # Video Tracking 라우터
 app.include_router(tracking_router)
 
+# Notion Sync 라우터
+app.include_router(sync_router)
+
 @app.on_event("startup")
 async def startup_event():
     tracking.init_db()
     tracking.retry_unsynced()
+    # Initialize Notion sync
+    notion_token = os.environ.get("NOTION_API_KEY", "")
+    if notion_token:
+        init_sync(
+            notion_token=notion_token,
+            config_db_id=os.environ.get("NOTION_CONFIG_DB_ID", ""),
+        )
 
 @app.get("/")
 async def root():

@@ -6,7 +6,7 @@ from fastapi import APIRouter, Request, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 
-import tracking
+from . import tracking
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -65,7 +65,7 @@ async def watch_page(request: Request, id: str, background_tasks: BackgroundTask
     })
 
 
-@router.post("/api/tracking/progress")
+@router.post("/api/webhook/tracking/progress")
 async def tracking_progress(request: Request, background_tasks: BackgroundTasks):
     content_type = request.headers.get("content-type", "")
     try:
@@ -103,7 +103,7 @@ async def tracking_progress(request: Request, background_tasks: BackgroundTasks)
     return JSONResponse({"status": "ok", "progress": round(progress, 1)})
 
 
-@router.post("/api/tracking/complete")
+@router.post("/api/webhook/tracking/complete")
 async def tracking_complete(request: Request, background_tasks: BackgroundTasks):
     try:
         data = await request.json()
@@ -131,7 +131,7 @@ async def tracking_complete(request: Request, background_tasks: BackgroundTasks)
     return JSONResponse({"status": "completed", "progress": round(progress, 1)})
 
 
-@router.get("/tracking/refresh", response_class=HTMLResponse)
+@router.get("/api/webhook/tracking/refresh", response_class=HTMLResponse)
 async def tracking_refresh(id: str):
     if not id or not validate_page_id(id):
         return HTMLResponse("<h1>잘못된 요청입니다.</h1>", status_code=400)

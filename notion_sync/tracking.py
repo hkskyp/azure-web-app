@@ -188,7 +188,6 @@ def build_notion_progress_properties(progress: float, watched_seconds: float, du
     return {
         "진도율": {"number": round(progress / 100, 3)},
         "시청시간(분)": {"number": round(watched_seconds / 60, 1)},
-        "동영상길이(분)": {"number": round(duration / 60, 1)}
     }
 
 
@@ -197,7 +196,6 @@ def build_notion_complete_properties(watch_end: str, progress: float, watched_se
         "시청종료시간": {"date": {"start": watch_end}},
         "진도율": {"number": round(progress / 100, 3)},
         "시청시간(분)": {"number": round(watched_seconds / 60, 1)},
-        "동영상길이(분)": {"number": round(duration / 60, 1)}
     }
 
 
