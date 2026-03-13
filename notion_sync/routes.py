@@ -68,6 +68,7 @@ def _identify_source_from_page(page: dict) -> str:
 async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
     """Handle Notion automation webhook."""
     payload = await request.json()
+    logger.warning(f"Webhook payload: {payload}")
     page_id = payload.get("id", "")
     logger.warning(f"Webhook received, page_id={page_id}")
 
