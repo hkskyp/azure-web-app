@@ -19,6 +19,7 @@ _CONFIG_KEY_MAP = {
     "SHARED_STUDY_LOG_DB_ID":  "study_log",
     "SHARED_PAYMENT_DB_ID":    "payment",
     "SHARED_PARENT_DB_ID":     "parent",
+    "SHARED_VIDEO_DB_ID":      "video",
 }
 
 
@@ -69,7 +70,17 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
     """Handle Notion automation webhook."""
     payload = await request.json()
     logger.warning(f"Webhook payload: {payload}")
-    page_id = payload.get("id", "")
+
+    # Notion 자동화 webhook payload 구조가 다양할 수 있으므로 여러 경로 탐색
+    page_id = (
+        payload.get("id")
+        or payload.get("page_id")
+        or (payload.get("data") or {}).get("page_id")
+        or (payload.get("data") or {}).get("id")
+        or ""
+    )
+    # Notion이 URL-safe 형식(하이픈 없음)으로 보낼 수 있으므로 정규화
+    page_id = page_id.strip().replace("-", "")
     logger.warning(f"Webhook received, page_id={page_id}")
 
     if not page_id:
@@ -95,6 +106,12 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
         background_tasks.add_task(
             sync_engine.create_student_individual_dbs, page_id, student_name)
         return {"status": "accepted", "direction": "new-student→individual-dbs"}
+
+    if source_type == "video":
+        background_tasks.add_task(
+            sync_engine.sync_video_to_enrollments,
+            page_id, SHARED_DB_IDS.get("enrollment", ""))
+        return {"status": "accepted", "direction": "video→enrollments"}
 
     if source_type in ("enrollment", "assignment", "payment"):
         background_tasks.add_task(

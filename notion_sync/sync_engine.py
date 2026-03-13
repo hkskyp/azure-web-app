@@ -127,6 +127,8 @@ def _extract_plain_text(prop: dict):
     elif ptype == "date":
         d = prop.get("date")
         return d.get("start") if d else None
+    elif ptype == "url":
+        return prop.get("url")
     elif ptype == "relation":
         return [r["id"] for r in prop.get("relation", [])]
     return None
@@ -260,6 +262,16 @@ def _find_by_sync_id(db_id: str, sync_id: str) -> str | None:
     return pages[0]["id"] if pages else None
 
 
+def _find_by_title(db_id: str, title: str) -> str | None:
+    """개별 수강목록 DB에서 매핑제목(title)으로 페이지 찾기."""
+    result = _query_database(
+        db_id,
+        filter={"property": "매핑제목", "title": {"equals": title}},
+    )
+    pages = result.get("results", [])
+    return pages[0]["id"] if pages else None
+
+
 # Prop types for individual DBs
 _IND_ENROLLMENT_TYPES = {
     "매핑제목": "title", "영상제목": "rich_text", "영상URL": "url",
@@ -293,13 +305,24 @@ def sync_shared_to_individual(source_db_type: str, page_id: str, page_data: dict
         map_fn = schema_map.shared_enrollment_to_individual if source_db_type == "enrollment" \
             else schema_map.shared_assignment_to_individual
 
+        # enrollment인 경우 수업영상 relation에서 영상 정보 resolve
+        video_kwargs = {}
+        if source_db_type == "enrollment":
+            video_ids = props.get("수업영상", []) or []
+            if video_ids:
+                try:
+                    video_info = _resolve_video_info(video_ids[0])
+                    video_kwargs = video_info
+                except Exception as e:
+                    logger.warning(f"Failed to resolve video info: {e}")
+
         for stu_page_id in student_page_ids:
             child_dbs = _get_student_child_dbs(stu_page_id)
             target_db = child_dbs.get(type_key)
             if not target_db:
                 logger.warning(f"No {type_key} DB found under student {stu_page_id}")
                 continue
-            mapped = map_fn(props, sync_id=page_id)
+            mapped = map_fn(props, sync_id=page_id, **video_kwargs)
             notion_props = _build_notion_props(mapped, prop_types)
             existing = _find_by_sync_id(target_db, page_id)
             if existing:
@@ -321,6 +344,89 @@ def sync_shared_to_individual(source_db_type: str, page_id: str, page_data: dict
                 else:
                     notion.pages.create(parent={"database_id": target_db}, properties=notion_props)
             logger.info(f"Synced payment to parents of student {stu_page_id}")
+
+
+def _resolve_video_info(video_page_id: str) -> dict:
+    """수업영상 페이지에서 영상 정보를 가져온다."""
+    page = notion.pages.retrieve(video_page_id)
+    props = _extract_props(page)
+    # 소속과목이 relation인 경우 과목명 조회
+    subject_name = ""
+    raw_props = page.get("properties", {})
+    subject_prop = raw_props.get("소속과목", {})
+    if subject_prop.get("type") == "relation":
+        rel_ids = [r["id"] for r in subject_prop.get("relation", [])]
+        if rel_ids:
+            sub_page = notion.pages.retrieve(rel_ids[0])
+            sub_props = _extract_props(sub_page)
+            # title 속성에서 과목명 추출
+            for v in sub_page.get("properties", {}).values():
+                if v.get("type") == "title":
+                    subject_name = "".join(
+                        t.get("plain_text", "") for t in v.get("title", []))
+                    break
+    return {
+        "video_title": props.get("영상제목", ""),
+        "video_url": props.get("영상URL", ""),
+        "subject_name": subject_name,
+    }
+
+
+def sync_video_to_enrollments(video_page_id: str, enrollment_db_id: str):
+    """수업영상 URL 변경 시 → 관련 공유 수강목록 → 개별 학생 수강목록 업데이트."""
+    if not enrollment_db_id:
+        logger.warning("No enrollment DB ID; skipping video sync")
+        return
+
+    video_info = _resolve_video_info(video_page_id)
+    logger.info(f"Video info: {video_info}")
+
+    # 공유 수강목록에서 이 영상을 참조하는 페이지 찾기
+    resp = _query_database(
+        enrollment_db_id,
+        filter={"property": "수업영상", "relation": {"contains": video_page_id}},
+    )
+    enrollment_pages = resp.get("results", [])
+    logger.info(f"Found {len(enrollment_pages)} enrollment(s) for video {video_page_id}")
+
+    for enroll_page in enrollment_pages:
+        enroll_id = enroll_page["id"]
+        enroll_props = _extract_props(enroll_page)
+        student_page_ids = enroll_props.get("학생", []) or []
+
+        for stu_page_id in student_page_ids:
+            child_dbs = _get_student_child_dbs(stu_page_id)
+            target_db = child_dbs.get("enrollment")
+            if not target_db:
+                logger.warning(f"No enrollment DB found under student {stu_page_id}")
+                continue
+
+            # 개별 수강목록에서 _sync_id로 해당 페이지 찾기
+            existing = _find_by_sync_id(target_db, enroll_id)
+
+            # _sync_id가 없으면 매핑제목으로 fallback 매칭
+            if not existing:
+                enroll_title = enroll_props.get("매핑제목", "")
+                if enroll_title:
+                    existing = _find_by_title(target_db, enroll_title)
+                    if existing:
+                        # _sync_id 채워넣기 (향후 매칭용)
+                        notion.pages.update(page_id=existing, properties={
+                            "_sync_id": {"rich_text": [{"text": {"content": enroll_id}}]}
+                        })
+                        logger.info(f"Backfilled _sync_id on {existing}")
+
+            update_props = _build_notion_props({
+                "영상URL": video_info["video_url"],
+                "영상제목": video_info["video_title"],
+                "소속과목": video_info["subject_name"],
+            }, _IND_ENROLLMENT_TYPES)
+
+            if existing:
+                notion.pages.update(page_id=existing, properties=update_props)
+                logger.info(f"Updated video URL on individual enrollment {existing}")
+            else:
+                logger.warning(f"No individual enrollment found for enroll_id={enroll_id}")
 
 
 def sync_individual_to_shared(source_db_type: str, page_id: str,
