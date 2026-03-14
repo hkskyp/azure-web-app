@@ -22,21 +22,33 @@ def shared_enrollment_to_individual(shared_props: dict, video_title: str = "",
 
 def shared_assignment_to_individual(shared_props: dict, subject_name: str = "",
                                      sync_id: str = "") -> dict:
-    """Map shared 과제 page properties → individual DB row."""
+    """Map shared 과제 page → individual DB (과제 스펙 + 채점 결과만, 제출 데이터 제외)."""
     return {
         "과제명": shared_props.get("과제명", ""),
         "과목명": subject_name,
-        "제출여부": shared_props.get("제출여부", False),
-        "제출일시": shared_props.get("제출일시"),
         "마감일": shared_props.get("마감일"),
         "점수": shared_props.get("점수"),
         "피드백": shared_props.get("피드백", ""),
+        "_sync_id": sync_id,
+        # 제출여부/제출일시는 개별 DB에서 학생이 관리 → 덮어쓰지 않음
+    }
+
+
+def individual_assignment_to_shared(ind_props: dict, student_page_id: str = "",
+                                     sync_id: str = "") -> dict:
+    """Map individual 과제 page → shared DB (학생 제출 현황 기록, 관리자 채점용)."""
+    return {
+        "과제명": ind_props.get("과제명", ""),
+        "마감일": ind_props.get("마감일"),
+        "제출여부": ind_props.get("제출여부", False),
+        "제출일시": ind_props.get("제출일시"),
+        "학생": [student_page_id] if student_page_id else [],
         "_sync_id": sync_id,
     }
 
 
 def individual_assignment_to_shared_update(ind_props: dict) -> dict:
-    """Map individual 과제 changes → shared DB update (student submissions only)."""
+    """Map individual 과제 제출 변경 → shared DB 업데이트 (제출 상태만)."""
     return {
         "제출여부": ind_props.get("제출여부"),
         "제출일시": ind_props.get("제출일시"),

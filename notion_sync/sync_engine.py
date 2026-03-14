@@ -293,6 +293,11 @@ _IND_PAYMENT_TYPES = {
     "납부여부": "checkbox", "납입일자": "date", "납부메모": "rich_text",
     "_sync_id": "rich_text",
 }
+_SHARED_ASSIGNMENT_TYPES = {
+    "과제명": "title", "마감일": "date",
+    "제출여부": "checkbox", "제출일시": "date",
+    "학생": "relation", "_sync_id": "rich_text",
+}
 
 
 # ── Sync functions ─────────────────────────────────────────────────────────
@@ -450,19 +455,43 @@ def sync_video_to_enrollments(video_page_id: str, enrollment_db_id: str):
 def sync_individual_to_shared(source_db_type: str, page_id: str,
                                page_data: dict, shared_db_id: str):
     """Sync an individual DB page → shared DB."""
-    props = _extract_props(page_data) if "properties" in page_data else page_data
+    # 부모 DB ID는 full page object에서만 추출 가능
+    parent_db_id = ""
+    if "properties" in page_data:
+        parent_db_id = page_data.get("parent", {}).get("database_id", "")
+        props = _extract_props(page_data)
+    else:
+        props = page_data
     sync_id = props.get("_sync_id", "")
 
     if source_db_type == "assignment_submission":
-        if not sync_id:
-            logger.warning("Individual assignment has no _sync_id")
-            return
-        update_props = schema_map.individual_assignment_to_shared_update(props)
-        notion_props = _build_notion_props(update_props, {
-            "제출여부": "checkbox", "제출일시": "date",
-        })
-        notion.pages.update(page_id=sync_id, properties=notion_props)
-        logger.info("Synced assignment submission back to shared DB")
+        if sync_id:
+            # 기존 공유 과제 페이지 업데이트 (제출 상태만)
+            update_props = schema_map.individual_assignment_to_shared_update(props)
+            notion_props = _build_notion_props(update_props, {
+                "제출여부": "checkbox", "제출일시": "date",
+            })
+            notion.pages.update(page_id=sync_id, properties=notion_props)
+            logger.info("Updated assignment submission in shared DB")
+        else:
+            # 신규 개별 과제 → 공유 과제 DB에 신규 생성
+            if not shared_db_id:
+                logger.warning("SHARED_ASSIGNMENT_DB_ID not set; cannot create shared assignment")
+                return
+            student_page_id = ""
+            if parent_db_id:
+                db_result = get_db_type_from_id(parent_db_id)
+                student_page_id = db_result[1] if db_result else ""
+            mapped = schema_map.individual_assignment_to_shared(
+                props, student_page_id=student_page_id, sync_id=page_id)
+            notion_props = _build_notion_props(mapped, _SHARED_ASSIGNMENT_TYPES)
+            new_page = notion.pages.create(
+                parent={"database_id": shared_db_id}, properties=notion_props)
+            # 개별 과제 페이지에 _sync_id 기록 (공유 페이지 ID)
+            notion.pages.update(page_id=page_id, properties={
+                "_sync_id": {"rich_text": [{"text": {"content": new_page["id"]}}]}
+            })
+            logger.info(f"Created shared assignment from individual, student={student_page_id}")
 
     elif source_db_type == "study_log":
         mapped = schema_map.individual_study_log_to_shared(props)
