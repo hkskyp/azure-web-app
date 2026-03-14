@@ -51,6 +51,16 @@ def _get_db_id(page: dict) -> str:
     return page.get("parent", {}).get("database_id", "")
 
 
+def _identify_source_from_db_id(db_id: str) -> str:
+    """Identify source DB type from database_id string (no API call)."""
+    db_id_clean = db_id.replace("-", "")
+    for db_type, sid in SHARED_DB_IDS.items():
+        if sid and db_id_clean == sid.replace("-", ""):
+            return db_type
+    result = sync_engine.get_db_type_from_id(db_id)
+    return result[0] if result else "unknown"
+
+
 def _identify_source_from_page(page: dict) -> str:
     """Identify source DB type from a full Notion page object."""
     db_id = _get_db_id(page)
@@ -87,21 +97,34 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
     if not page_id:
         return {"status": "ignored", "reason": "no page_id"}
 
-    # Notion 자동화 webhook payload는 내용이 불완전할 수 있으므로 API로 직접 조회
-    try:
-        page = sync_engine.notion.pages.retrieve(page_id)
-    except Exception as e:
-        logger.error(f"Failed to retrieve page {page_id}: {e}")
-        return {"status": "error", "reason": str(e)}
+    logger.warning(f"Webhook received, page_id={page_id}")
 
-    source_type = _identify_source_from_page(page)
-    logger.warning(f"Source: {source_type}, page: {page_id}")
+    # Notion 자동화 body에 database_id + properties가 있으면 API 조회 생략
+    database_id = (payload.get("database_id") or "").replace("-", "")
+    payload_props = payload.get("properties")  # flat dict: {속성명: 값, ...}
+
+    if database_id and payload_props is not None:
+        source_type = _identify_source_from_db_id(database_id)
+        # individual DB의 경우 student 조회를 위해 부모 DB ID를 주입
+        page_data = {**payload_props, "_parent_db_id": database_id}
+        logger.warning(f"Source (payload): {source_type}, page: {page_id}")
+    else:
+        # fallback: Notion API로 페이지 직접 조회
+        try:
+            page_data = sync_engine.notion.pages.retrieve(page_id)
+        except Exception as e:
+            logger.error(f"Failed to retrieve page {page_id}: {e}")
+            return {"status": "error", "reason": str(e)}
+        source_type = _identify_source_from_page(page_data)
+        logger.warning(f"Source (API): {source_type}, page: {page_id}")
 
     if source_type == "student":
-        name_prop = page.get("properties", {}).get("이름", {})
-        student_name = "".join(
-            t.get("plain_text", "") for t in name_prop.get("title", [])
-        )
+        if "properties" in page_data:
+            name_prop = page_data.get("properties", {}).get("이름", {})
+            student_name = "".join(
+                t.get("plain_text", "") for t in name_prop.get("title", []))
+        else:
+            student_name = page_data.get("이름", "")
         if not student_name:
             return {"status": "ignored", "reason": "no student name"}
         background_tasks.add_task(
@@ -117,20 +140,20 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
     if source_type in ("enrollment", "assignment", "payment"):
         background_tasks.add_task(
             sync_engine.sync_shared_to_individual,
-            source_type, page_id, page)
+            source_type, page_id, page_data)
         return {"status": "accepted", "direction": "shared→individual"}
 
     elif source_type == "individual_study_log":
         background_tasks.add_task(
             sync_engine.sync_individual_to_shared,
-            "study_log", page_id, page,
+            "study_log", page_id, page_data,
             SHARED_DB_IDS.get("study_log", ""))
         return {"status": "accepted", "direction": "individual→shared"}
 
     elif source_type == "individual_assignment":
         background_tasks.add_task(
             sync_engine.sync_individual_to_shared,
-            "assignment_submission", page_id, page,
+            "assignment_submission", page_id, page_data,
             SHARED_DB_IDS.get("assignment", ""))
         return {"status": "accepted", "direction": "individual→shared"}
 

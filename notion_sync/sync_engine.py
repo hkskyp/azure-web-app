@@ -462,6 +462,7 @@ def sync_individual_to_shared(source_db_type: str, page_id: str,
         props = _extract_props(page_data)
     else:
         props = page_data
+        parent_db_id = page_data.get("_parent_db_id", "")
     sync_id = props.get("_sync_id", "")
 
     if source_db_type == "assignment_submission":
