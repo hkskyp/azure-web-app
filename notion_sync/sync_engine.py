@@ -214,6 +214,7 @@ _ASSIGNMENT_SCHEMA = {
     "점수": {"number": {"format": "number"}},
     "피드백": {"rich_text": {}},
     "첨부파일": {"files": {}},
+    "_sync_id": {"rich_text": {}},  # 공유 과제 페이지 ID
 }
 
 _STUDY_LOG_SCHEMA = {
@@ -477,22 +478,26 @@ def sync_individual_to_shared(source_db_type: str, page_id: str,
         else:
             # 신규 개별 과제 → 공유 과제 DB에 신규 생성
             if not shared_db_id:
-                logger.warning("SHARED_ASSIGNMENT_DB_ID not set; cannot create shared assignment")
+                logger.error("SHARED_ASSIGNMENT_DB_ID not set; cannot create shared assignment")
                 return
             student_page_id = ""
             if parent_db_id:
                 db_result = get_db_type_from_id(parent_db_id)
                 student_page_id = db_result[1] if db_result else ""
+            logger.info(f"Creating shared assignment: parent_db={parent_db_id}, student={student_page_id}")
             mapped = schema_map.individual_assignment_to_shared(
                 props, student_page_id=student_page_id, sync_id=page_id)
             notion_props = _build_notion_props(mapped, _SHARED_ASSIGNMENT_TYPES)
             new_page = notion.pages.create(
                 parent={"database_id": shared_db_id}, properties=notion_props)
+            logger.info(f"Created shared assignment page: {new_page['id']}")
             # 개별 과제 페이지에 _sync_id 기록 (공유 페이지 ID)
-            notion.pages.update(page_id=page_id, properties={
-                "_sync_id": {"rich_text": [{"text": {"content": new_page["id"]}}]}
-            })
-            logger.info(f"Created shared assignment from individual, student={student_page_id}")
+            try:
+                notion.pages.update(page_id=page_id, properties={
+                    "_sync_id": {"rich_text": [{"text": {"content": new_page["id"]}}]}
+                })
+            except Exception as e:
+                logger.warning(f"_sync_id 기록 실패 (개별 과제 DB에 속성 없음?): {e}")
 
     elif source_db_type == "study_log":
         mapped = schema_map.individual_study_log_to_shared(props)
