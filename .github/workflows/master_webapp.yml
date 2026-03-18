@@ -66,5 +66,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'webapp'
+          app-name: 'azure-web-app'
           slot-name: 'Production'
