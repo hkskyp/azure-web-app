@@ -46,6 +46,10 @@ async def startup_event():
             parent_page_id=os.environ.get("NOTION_PARENT_PAGE_ID", ""),
         )
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 @app.get("/")
 async def root():
     """루트 경로를 홈으로 리다이렉트"""
