@@ -8,8 +8,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from coordinate_converter import CoordinateConverter
 from data.certificates import CERTIFICATES
 import os
-from notion_sync import tracking
-from notion_sync.tracking_routes import router as tracking_router
+from notion_sync.tracking.routes import router as tracking_router
 from notion_sync.routes import router as sync_router, init as init_sync
 
 # FastAPI 앱 생성
@@ -44,7 +43,7 @@ async def startup_event():
     if notion_token:
         init_sync(
             notion_token=notion_token,
-            config_db_id=os.environ.get("NOTION_CONFIG_DB_ID", ""),
+            parent_page_id=os.environ.get("NOTION_PARENT_PAGE_ID", ""),
         )
 
 @app.get("/")

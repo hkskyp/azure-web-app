@@ -1,1 +1,1 @@
-# notion_sync — Webhook-based sync between shared and individual Notion DBs
+# notion_sync — Academy Notion webhook sync + video tracking

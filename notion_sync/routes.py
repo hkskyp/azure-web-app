@@ -4,157 +4,235 @@ import logging
 
 from fastapi import APIRouter, Request, BackgroundTasks
 
-from . import sync_engine
+from notion_sync.sync.student_dbs import create_student_individual_dbs, get_db_type_from_id
+from notion_sync.sync.engine import sync_shared_to_individual
+from notion_sync.sync.individual_sync import sync_individual_to_shared
+from notion_sync.notion_helpers import init_notion, query_database
+from notion_sync.sync_utils import discover_config_db as _discover_config_db
 
-logger = logging.getLogger("notion_sync")
+logger = logging.getLogger("webapp.routes")
 router = APIRouter(prefix="/api/webhook", tags=["notion-sync"])
 
 SHARED_DB_IDS = {}
+SHARED_DATABASE_IDS = {}
 
-# Maps 설정명 → internal key used in SHARED_DB_IDS
-_CONFIG_KEY_MAP = {
-    "SHARED_STUDENT_DB_ID":    "student",
-    "SHARED_ENROLLMENT_DB_ID": "enrollment",
-    "SHARED_ASSIGNMENT_DB_ID": "assignment",
-    "SHARED_STUDY_LOG_DB_ID":  "study_log",
-    "SHARED_PAYMENT_DB_ID":    "payment",
-    "SHARED_PARENT_DB_ID":     "parent",
-    "SHARED_VIDEO_DB_ID":      "video",
+_DB_NAME_MAP = {
+    "학생 DB": "student",
+    "수업영상 DB": "video",
+    "과제 DB": "assignment",
+    "학습일지 DB": "study_log",
+    "시청기록 DB": "watch_history",
+    "학부모 DB": "parent",
 }
 
 
 def _load_config(config_db_id: str):
-    """Query Notion config DB and populate SHARED_DB_IDS."""
+    """Query config DB (DB명/database_id/data_source_id/설명) and populate ID dicts."""
     try:
-        resp = sync_engine._query_database(config_db_id)
+        resp = query_database(config_db_id)
         for page in resp.get("results", []):
             props = page.get("properties", {})
-            key = "".join(t["plain_text"] for t in props.get("설정명", {}).get("title", []))
-            val = "".join(t["plain_text"] for t in props.get("값", {}).get("rich_text", []))
-            internal = _CONFIG_KEY_MAP.get(key)
-            if internal and val:
-                SHARED_DB_IDS[internal] = val
-        logger.info(f"Config loaded: {list(SHARED_DB_IDS.keys())}")
+            db_name = "".join(t["plain_text"] for t in props.get("DB명", {}).get("title", []))
+            ds_id = "".join(t["plain_text"] for t in props.get("data_source_id", {}).get("rich_text", []))
+            db_id = "".join(t["plain_text"] for t in props.get("database_id", {}).get("rich_text", []))
+            key = _DB_NAME_MAP.get(db_name)
+            if key:
+                if ds_id:
+                    SHARED_DB_IDS[key] = ds_id
+                if db_id:
+                    SHARED_DATABASE_IDS[key] = db_id
+        logger.info(f"Config loaded: data_source_ids={list(SHARED_DB_IDS.keys())}, "
+                     f"database_ids={list(SHARED_DATABASE_IDS.keys())}")
     except Exception as e:
-        logger.error(f"Failed to load config from Notion: {e}")
+        logger.error(f"Failed to load config: {e}")
 
 
-def init(notion_token: str, config_db_id: str = None):
-    """Initialize sync system — load config from Notion config DB."""
-    sync_engine.init_notion(notion_token)
-    if config_db_id:
-        _load_config(config_db_id)
-        sync_engine.shared_parent_db_id = SHARED_DB_IDS.get("parent", "")
+_CONFIG_CACHE_FILE = "/tmp/notion_config_db_id.txt"
 
 
-def _get_db_id(page: dict) -> str:
-    return page.get("parent", {}).get("database_id", "")
+def _get_config_db_id(parent_page_id: str) -> str | None:
+    """Resolve config DB ID: cache file → discover from parent page.
+
+    If cached ID is stale (config query returns empty), re-discovers.
+    """
+    import os
+    parent_page_id = parent_page_id.strip() if parent_page_id else ""
+
+    # 1. Try cached ID, validate it
+    if os.path.exists(_CONFIG_CACHE_FILE):
+        cached = open(_CONFIG_CACHE_FILE).read().strip()
+        if cached:
+            try:
+                resp = query_database(cached)
+                if resp.get("results"):
+                    logger.info(f"Config DB ID from cache: {cached}")
+                    return cached
+            except Exception:
+                pass
+            logger.info("Cached config DB invalid, re-discovering...")
+
+    # 2. NOTION_PARENT_PAGE_ID로 검색
+    if parent_page_id:
+        discovered = _discover_config_db(parent_page_id)
+        if discovered:
+            with open(_CONFIG_CACHE_FILE, "w") as f:
+                f.write(discovered)
+            logger.info(f"Config DB ID discovered and cached: {discovered}")
+            return discovered
+
+    return None
 
 
-def _identify_source_from_db_id(db_id: str) -> str:
-    """Identify source DB type from database_id string (no API call)."""
-    db_id_clean = db_id.replace("-", "")
-    for db_type, sid in SHARED_DB_IDS.items():
-        if sid and db_id_clean == sid.replace("-", ""):
-            return db_type
-    result = sync_engine.get_db_type_from_id(db_id)
-    return result[0] if result else "unknown"
+def init(notion_token: str, parent_page_id: str = None):
+    init_notion(notion_token)
+    resolved = _get_config_db_id(parent_page_id or "")
+    if resolved:
+        _load_config(resolved)
+    else:
+        logger.warning("No config DB ID found — sync routing will not work")
 
 
-def _identify_source_from_page(page: dict) -> str:
-    """Identify source DB type from a full Notion page object."""
-    db_id = _get_db_id(page)
+def _prop_empty(prop: dict) -> bool:
+    ptype = prop.get("type", "")
+    val = prop.get(ptype)
+    if val is None:
+        return True
+    if isinstance(val, list):
+        return len(val) == 0
+    return False
+
+
+def _validate_props(props: dict, required: list[str], context: str, page_id: str) -> list[str]:
+    missing = []
+    for key in required:
+        if key not in props:
+            missing.append(f"{key}(누락)")
+        elif _prop_empty(props[key]):
+            missing.append(f"{key}(빈값)")
+    if missing:
+        logger.warning(f"[{context}] page={page_id} 필수 속성 부족: {missing}")
+    return missing
+
+
+def _identify_source(page: dict) -> str:
+    parent = page.get("parent", {})
+    db_id = parent.get("database_id", "") or parent.get("data_source_id", "")
     if not db_id:
         return "unknown"
-
     db_id_clean = db_id.replace("-", "")
+    # 1. data_source_id로 직접 매칭
     for db_type, sid in SHARED_DB_IDS.items():
         if sid and db_id_clean == sid.replace("-", ""):
             return db_type
-
-    result = sync_engine.get_db_type_from_id(db_id)
+    # 2. database_id (block-level ID)로 매칭
+    for db_type, did in SHARED_DATABASE_IDS.items():
+        if did and db_id_clean == did.replace("-", ""):
+            return db_type
+    # 3. 개별 DB 확인 (API 호출)
+    result = get_db_type_from_id(db_id)
     return result[0] if result else "unknown"
+
+
+# --- Handler functions ---
+
+def _handle_student(config, source_type, page_id, props, page_data, background_tasks):
+    if _validate_props(props, config.get("validate", []), "student", page_id):
+        return {"status": "ignored", "reason": "missing props"}
+    name = "".join(t.get("plain_text", "") for t in props["이름"].get("title", []))
+    background_tasks.add_task(create_student_individual_dbs, page_id, name, SHARED_DB_IDS)
+    return {"status": "accepted", "action": "create-individual-dbs"}
+
+
+def _handle_shared_sync(config, source_type, page_id, props, page_data, background_tasks):
+    # Pre-filter (e.g., study_log requires 강사코멘트)
+    pre_filter = config.get("filter")
+    if pre_filter and not pre_filter(props):
+        return {"status": "ignored", "source": source_type}
+
+    has_student = "학생" in props and not _prop_empty(props["학생"])
+    has_sync_id = "_sync_id" in props and not _prop_empty(props["_sync_id"])
+    if not has_student and not has_sync_id:
+        return {"status": "ignored", "reason": "missing props"}
+
+    # 채점 sub-path (assignment: 점수/피드백만 전달)
+    grading_filter = config.get("grading_filter")
+    if grading_filter and grading_filter(props):
+        background_tasks.add_task(
+            sync_shared_to_individual, config["grading_config"], page_id, page_data)
+        return {"status": "accepted", "action": config["grading_config"]}
+
+    background_tasks.add_task(
+        sync_shared_to_individual, config["sync_config"], page_id, page_data)
+    return {"status": "accepted", "direction": "shared->individual"}
+
+
+def _handle_individual(config, source_type, page_id, props, page_data, background_tasks):
+    has_sync_id = "_sync_id" in props and not _prop_empty(props["_sync_id"])
+    if has_sync_id:
+        background_tasks.add_task(
+            sync_individual_to_shared,
+            config["sync_type"], page_id, page_data,
+            SHARED_DB_IDS.get(config["shared_key"], ""))
+        return {"status": "accepted", "direction": "individual->shared", "action": "update"}
+    # CREATE: validate required props
+    create_validate = config.get("create_validate", [])
+    if create_validate:
+        if _validate_props(props, create_validate, f"{source_type}_create", page_id):
+            return {"status": "ignored", "reason": "missing props"}
+    background_tasks.add_task(
+        sync_individual_to_shared,
+        config["sync_type"], page_id, page_data,
+        SHARED_DB_IDS.get(config["shared_key"], ""))
+    return {"status": "accepted", "direction": "individual->shared", "action": "create"}
+
+
+# --- Handler config ---
+
+_HANDLERS = {
+    "student": {
+        "validate": ["이름"],
+        "action": _handle_student,
+    },
+    "assignment": {
+        "action": _handle_shared_sync,
+        "grading_filter": lambda props: ("점수" in props or "피드백" in props) and "과제명" not in props,
+        "grading_config": "grading",
+        "sync_config": "assignment",
+    },
+    "study_log": {
+        "action": _handle_shared_sync,
+        "filter": lambda props: "강사코멘트" in props,
+        "sync_config": "comment",
+    },
+    "individual_assignment": {
+        "sync_type": "assignment_submission",
+        "shared_key": "assignment",
+        "create_validate": ["과제명"],
+        "action": _handle_individual,
+    },
+    "individual_study_log": {
+        "sync_type": "study_log",
+        "shared_key": "study_log",
+        "create_validate": ["일지제목"],
+        "action": _handle_individual,
+    },
+}
 
 
 @router.post("/notion")
 async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
-    """Handle Notion automation webhook."""
     payload = await request.json()
-    logger.warning(f"Webhook payload: {payload}")
+    page_data = payload.get("data") or {}
+    page_id = (page_data.get("id") or "").strip()
 
-    # Notion 자동화 webhook payload 구조가 다양할 수 있으므로 여러 경로 탐색
-    page_id = (
-        payload.get("id")
-        or payload.get("page_id")
-        or (payload.get("data") or {}).get("page_id")
-        or (payload.get("data") or {}).get("id")
-        or ""
-    )
-    # Notion이 URL-safe 형식(하이픈 없음)으로 보낼 수 있으므로 정규화
-    page_id = page_id.strip().replace("-", "")
-    logger.warning(f"Webhook received, page_id={page_id}")
+    if not page_id or not page_data:
+        return {"status": "ignored", "reason": "no data"}
 
-    if not page_id:
-        return {"status": "ignored", "reason": "no page_id"}
+    source_type = _identify_source(page_data)
+    logger.info(f"Webhook: source={source_type}, page={page_id}")
+    props = page_data.get("properties", {})
 
-    logger.warning(f"Webhook received, page_id={page_id}")
-
-    # Notion 자동화 body에 database_id + properties가 있으면 API 조회 생략
-    database_id = (payload.get("database_id") or "").replace("-", "")
-    payload_props = payload.get("properties")  # flat dict: {속성명: 값, ...}
-
-    if database_id and payload_props is not None:
-        source_type = _identify_source_from_db_id(database_id)
-        # individual DB의 경우 student 조회를 위해 부모 DB ID를 주입
-        page_data = {**payload_props, "_parent_db_id": database_id}
-        logger.warning(f"Source (payload): {source_type}, page: {page_id}")
-    else:
-        # fallback: Notion API로 페이지 직접 조회
-        try:
-            page_data = sync_engine.notion.pages.retrieve(page_id)
-        except Exception as e:
-            logger.error(f"Failed to retrieve page {page_id}: {e}")
-            return {"status": "error", "reason": str(e)}
-        source_type = _identify_source_from_page(page_data)
-        logger.warning(f"Source (API): {source_type}, page: {page_id}")
-
-    if source_type == "student":
-        if "properties" in page_data:
-            name_prop = page_data.get("properties", {}).get("이름", {})
-            student_name = "".join(
-                t.get("plain_text", "") for t in name_prop.get("title", []))
-        else:
-            student_name = page_data.get("이름", "")
-        if not student_name:
-            return {"status": "ignored", "reason": "no student name"}
-        background_tasks.add_task(
-            sync_engine.create_student_individual_dbs, page_id, student_name)
-        return {"status": "accepted", "direction": "new-student→individual-dbs"}
-
-    if source_type == "video":
-        background_tasks.add_task(
-            sync_engine.sync_video_to_enrollments,
-            page_id, SHARED_DB_IDS.get("enrollment", ""))
-        return {"status": "accepted", "direction": "video→enrollments"}
-
-    if source_type in ("enrollment", "assignment", "payment"):
-        background_tasks.add_task(
-            sync_engine.sync_shared_to_individual,
-            source_type, page_id, page_data)
-        return {"status": "accepted", "direction": "shared→individual"}
-
-    elif source_type == "individual_study_log":
-        background_tasks.add_task(
-            sync_engine.sync_individual_to_shared,
-            "study_log", page_id, page_data,
-            SHARED_DB_IDS.get("study_log", ""))
-        return {"status": "accepted", "direction": "individual→shared"}
-
-    elif source_type == "individual_assignment":
-        background_tasks.add_task(
-            sync_engine.sync_individual_to_shared,
-            "assignment_submission", page_id, page_data,
-            SHARED_DB_IDS.get("assignment", ""))
-        return {"status": "accepted", "direction": "individual→shared"}
-
-    return {"status": "ignored", "source": source_type}
+    handler = _HANDLERS.get(source_type)
+    if not handler:
+        return {"status": "ignored", "source": source_type}
+    return handler["action"](handler, source_type, page_id, props, page_data, background_tasks)
