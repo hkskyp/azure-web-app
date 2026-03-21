@@ -10,7 +10,10 @@ from data.certificates import CERTIFICATES
 import os
 from notion_sync.tracking.routes import router as tracking_router
 from notion_sync.routes import router as sync_router, init as init_sync
-from notion_sync.stats.routes import router as stats_router
+try:
+    from notion_sync.stats.routes import router as stats_router
+except Exception:
+    stats_router = None
 
 # ── Azure Queue client (sync-shared) ──────────────────────────
 _queue_client = None
@@ -47,7 +50,8 @@ app.include_router(tracking_router)
 app.include_router(sync_router)
 
 # Stats 라우터
-app.include_router(stats_router)
+if stats_router:
+    app.include_router(stats_router)
 
 @app.on_event("startup")
 async def startup_event():
