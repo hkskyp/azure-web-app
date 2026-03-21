@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>동영상 시청</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f59e0b'/><text x='16' y='22' text-anchor='middle' font-size='18' font-weight='800' fill='%231c1917'>C</text></svg>">
+    <link rel="preload" href="/static/fonts/AcademyFont.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/static/css/watch.css">
+    <script>void function(){document.documentElement.setAttribute('data-skin',localStorage.getItem('watch-skin')||'b')}()</script>
+</head>
+<body>
+    <header class="watch-header">
+        <div class="header-inner">
+            <div class="header-brand">
+                <span class="header-logo">C</span>
+                <h1 class="header-title">도안커넥트영어학원</h1>
+            </div>
+            <button class="skin-toggle" id="skinToggle" type="button" aria-label="테마 전환">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+        </div>
+    </header>
+    <main class="watch-main">
+        <div class="video-wrap">
+            <div class="video-container">
+                <video id="videoPlayer" controls preload="none" playsinline>
+                    브라우저가 동영상을 지원하지 않습니다.
+                </video>
+            </div>
+        </div>
+        <div class="controls-panel">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span class="progress-label-text">진도율</span>
+                    <span class="progress-value" id="progressText">{{ progress }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressBar" style="width:{{ progress }}%"></div>
+                </div>
+            </div>
+            <button class="complete-btn" id="completeBtn" {% if is_completed %}disabled{% endif %}>
+                {% if is_completed %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>완료됨{% else %}수강 완료{% endif %}
+            </button>
+        </div>
+    </main>
+    <script>document.getElementById('skinToggle').addEventListener('click',function(){var c=document.documentElement.getAttribute('data-skin')||'b',n=c==='b'?'a':'b';document.documentElement.setAttribute('data-skin',n);localStorage.setItem('watch-skin',n)})</script>
+    <script>
+        window.__WATCH_CONFIG = {
+            pageId: "{{ page_id }}",
+            streamUrl: "{{ stream_url }}",
+            currentPosition: {{ current_position }},
+            progress: {{ progress }},
+            watchedSeconds: {{ watched_seconds }},
+            isCompleted: {{ "true" if is_completed else "false" }},
+            previewMode: {{ "true" if preview_mode else "false" }},
+        };
+    </script>
+    <script src="/static/js/watch.js"></script>
+</body>
+</html>

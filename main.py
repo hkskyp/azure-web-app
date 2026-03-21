@@ -10,6 +10,16 @@ from data.certificates import CERTIFICATES
 import os
 from notion_sync.tracking.routes import router as tracking_router
 from notion_sync.routes import router as sync_router, init as init_sync
+from notion_sync.stats.routes import router as stats_router
+
+# ── Azure Queue client (sync-shared) ──────────────────────────
+_queue_client = None
+
+
+def get_queue_client():
+    """Return the sync-shared queue client (or None if not initialized)."""
+    return _queue_client
+
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -36,6 +46,9 @@ app.include_router(tracking_router)
 # Notion Sync 라우터
 app.include_router(sync_router)
 
+# Stats 라우터
+app.include_router(stats_router)
+
 @app.on_event("startup")
 async def startup_event():
     # Initialize Notion sync
@@ -45,6 +58,21 @@ async def startup_event():
             notion_token=notion_token,
             parent_page_id=os.environ.get("NOTION_PARENT_PAGE_ID", ""),
         )
+
+    # Azure Queue 초기화
+    global _queue_client
+    conn_str = os.environ.get("AzureWebJobsStorage", "")
+    if conn_str:
+        from azure.storage.queue import QueueClient
+        _queue_client = QueueClient.from_connection_string(conn_str, "sync-shared")
+        try:
+            _queue_client.create_queue()
+        except Exception as e:
+            if "QueueAlreadyExists" not in type(e).__name__:
+                import logging
+                logging.getLogger("webapp").warning(f"Queue create warning: {e}")
+        import logging
+        logging.getLogger("webapp").info("Azure Queue 'sync-shared' initialized")
 
 @app.get("/health")
 async def health():

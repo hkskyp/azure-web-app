@@ -5,7 +5,6 @@ import logging
 from fastapi import APIRouter, Request, BackgroundTasks
 
 from notion_sync.sync.student_dbs import create_student_individual_dbs, get_db_type_from_id
-from notion_sync.sync.engine import sync_shared_to_individual
 from notion_sync.sync.individual_sync import sync_individual_to_shared
 from notion_sync.notion_helpers import init_notion, query_database
 from notion_sync.sync_utils import discover_config_db as _discover_config_db
@@ -17,6 +16,7 @@ SHARED_DB_IDS = {}
 SHARED_DATABASE_IDS = {}
 
 _DB_NAME_MAP = {
+    "과목 DB": "subject",
     "학생 DB": "student",
     "수업영상 DB": "video",
     "과제 DB": "assignment",
@@ -143,27 +143,30 @@ def _handle_student(config, source_type, page_id, props, page_data, background_t
     return {"status": "accepted", "action": "create-individual-dbs"}
 
 
-def _handle_shared_sync(config, source_type, page_id, props, page_data, background_tasks):
+def _handle_shared_enqueue(config, source_type, page_id, props, page_data, background_tasks):
+    """공유 DB 변경 → Azure Queue에 메시지 전송."""
+    import json, base64
+    from main import get_queue_client
+
     # Pre-filter (e.g., study_log requires 강사코멘트)
     pre_filter = config.get("filter")
     if pre_filter and not pre_filter(props):
         return {"status": "ignored", "source": source_type}
 
-    has_student = "학생" in props and not _prop_empty(props["학생"])
-    has_sync_id = "_sync_id" in props and not _prop_empty(props["_sync_id"])
-    if not has_student and not has_sync_id:
-        return {"status": "ignored", "reason": "missing props"}
+    queue = get_queue_client()
+    if not queue:
+        logger.error("Queue client not initialized — shared sync skipped")
+        return {"status": "error", "reason": "queue not initialized"}
 
-    # 채점 sub-path (assignment: 점수/피드백만 전달)
-    grading_filter = config.get("grading_filter")
-    if grading_filter and grading_filter(props):
-        background_tasks.add_task(
-            sync_shared_to_individual, config["grading_config"], page_id, page_data)
-        return {"status": "accepted", "action": config["grading_config"]}
-
-    background_tasks.add_task(
-        sync_shared_to_individual, config["sync_config"], page_id, page_data)
-    return {"status": "accepted", "direction": "shared->individual"}
+    msg = json.dumps({"db_type": source_type, "page_id": page_id, "page_data": page_data})
+    encoded = base64.b64encode(msg.encode()).decode()
+    try:
+        queue.send_message(encoded)
+    except Exception as e:
+        logger.error(f"Queue send failed: {source_type} page={page_id}: {e}")
+        return {"status": "error", "reason": "queue send failed"}
+    logger.info(f"Enqueued sync: {source_type} page={page_id}")
+    return {"status": "accepted", "action": "enqueued", "type": source_type}
 
 
 def _handle_individual(config, source_type, page_id, props, page_data, background_tasks):
@@ -193,16 +196,15 @@ _HANDLERS = {
         "validate": ["이름"],
         "action": _handle_student,
     },
+    "video": {
+        "action": _handle_shared_enqueue,
+    },
     "assignment": {
-        "action": _handle_shared_sync,
-        "grading_filter": lambda props: ("점수" in props or "피드백" in props) and "과제명" not in props,
-        "grading_config": "grading",
-        "sync_config": "assignment",
+        "action": _handle_shared_enqueue,
     },
     "study_log": {
-        "action": _handle_shared_sync,
+        "action": _handle_shared_enqueue,
         "filter": lambda props: "강사코멘트" in props,
-        "sync_config": "comment",
     },
     "individual_assignment": {
         "sync_type": "assignment_submission",
@@ -228,9 +230,19 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
     if not page_id or not page_data:
         return {"status": "ignored", "reason": "no data"}
 
-    source_type = _identify_source(page_data)
-    logger.info(f"Webhook: source={source_type}, page={page_id}")
+    event = request.query_params.get("event", "")
     props = page_data.get("properties", {})
+
+    source_type = _identify_source(page_data)
+
+    # event=edited에서 _sync_id가 비어있으면 무시 (Page added와 동시 발동 방지)
+    # video는 _sync_id 속성이 없으므로 제외
+    if event == "edited" and source_type != "video":
+        sync_prop = props.get("_sync_id", {})
+        if not sync_prop or _prop_empty(sync_prop):
+            return {"status": "ignored", "reason": "edited without _sync_id"}
+
+    logger.info(f"Webhook: source={source_type}, page={page_id}, event={event}")
 
     handler = _HANDLERS.get(source_type)
     if not handler:

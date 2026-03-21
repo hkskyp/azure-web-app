@@ -189,6 +189,92 @@ def _create_db(title: str, page_id: str, schema: dict, icon: str):
     return resp.json()
 
 
+# ---------------------------------------------------------------------------
+# Parent stats DB (학습현황)
+# ---------------------------------------------------------------------------
+
+_PARENT_STATS_SCHEMA = {
+    # ── 식별 ──
+    "주간 · 이름": {"title": {}},
+    "기간시작": {"date": {}},
+    "주차": {"formula": {
+        "expression": 'format(month(prop("기간시작"))) + "월 " + format(ceil(date(prop("기간시작")) / 7)) + "주차"',
+    }},
+    "자녀": {"select": {"options": []}},
+
+    # ── 5개 핵심 지표 (raw data) ──
+    "학습활동일": {"number": {"format": "number"}},
+    "시청수": {"number": {"format": "number"}},
+    "유효시청수": {"number": {"format": "number"}},
+    "마감과제": {"number": {"format": "number"}},
+    "제출과제": {"number": {"format": "number"}},
+    "정시제출": {"number": {"format": "number"}},
+    "평균점수": {"number": {"format": "number"}},
+    "시청시간(분)": {"number": {"format": "number"}},
+    "자습시간(분)": {"number": {"format": "number"}},
+
+    # ── 자기평가 추이 ──
+    "자기평가": {"number": {"format": "number"}},
+
+    # ── 비율 (서버 계산, percent 포맷) ──
+    "유효시청률": {"number": {"format": "percent"}},
+    "과제제출률": {"number": {"format": "percent"}},
+
+    # ── 추세 (이전 주 대비 변화량, 서버 계산) ──
+    "활동일_변화": {"number": {"format": "number"}},
+    "시청률_변화": {"number": {"format": "percent"}},
+    "제출률_변화": {"number": {"format": "percent"}},
+    "점수_변화": {"number": {"format": "number"}},
+    "평가_변화": {"number": {"format": "number"}},
+
+    # ── 종합등급 (관리자가 Notion UI에서 lets/ifs 수식으로 교체) ──
+    "종합등급": {"formula": {
+        "expression": '"종합등급 수식을 입력하세요"',
+    }},
+}
+
+_PARENT_STATS_CACHE: dict[str, str] = {}
+
+
+def ensure_parent_stats_db(parent_page_id: str) -> str:
+    """학부모 페이지 하위 '학습현황' child DB 확보. 없으면 생성."""
+    from notion_sync.notion_helpers import _block_to_ds_id
+
+    if parent_page_id in _PARENT_STATS_CACHE:
+        return _PARENT_STATS_CACHE[parent_page_id]
+
+    resp = notion_helpers.notion.blocks.children.list(block_id=parent_page_id)
+    for block in resp.get("results", []):
+        if block["type"] != "child_database":
+            continue
+        title = block["child_database"].get("title", "")
+        if "학습현황" in title:
+            ds_id = _block_to_ds_id(block["id"])
+            _PARENT_STATS_CACHE[parent_page_id] = ds_id
+            return ds_id
+
+    # 없으면 생성
+    db_resp = _create_db("학습현황", parent_page_id, _PARENT_STATS_SCHEMA, "📊")
+    db_block_id = db_resp["id"]
+    ds_list = db_resp.get("data_sources", [])
+    ds_id = ds_list[0]["id"] if ds_list else db_block_id
+    # creation 시 icon 무시될 수 있으므로 PATCH
+    import httpx
+    try:
+        httpx.patch(f"https://api.notion.com/v1/databases/{db_block_id}",
+            headers={
+                "Authorization": f"Bearer {notion_helpers.notion.options.auth}",
+                "Notion-Version": "2025-09-03",
+            },
+            json={"icon": {"type": "emoji", "emoji": "📊"}},
+            timeout=30)
+    except Exception:
+        pass
+    _PARENT_STATS_CACHE[parent_page_id] = ds_id
+    logger.info(f"Created 학습현황 DB for parent: {parent_page_id}")
+    return ds_id
+
+
 def _build_schema_with_subject(base_schema, field_name, shared_db_ids):
     """Build schema replacing field_name with subject relation if available."""
     schema = dict(base_schema)

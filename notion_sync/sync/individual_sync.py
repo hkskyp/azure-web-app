@@ -114,6 +114,7 @@ _SYNC_CONFIG = {
         "update_fn": None,
         "on_create": _set_study_date,
         "build_mapped": _build_study_log_mapped,
+        "writeback_keys": ["날짜"],
     },
 }
 
@@ -153,6 +154,17 @@ def _do_create(config, page_id, props, page_data, shared_db_id, parent_db_id):
     if not shared_db_id:
         logger.error(f"Shared DB ID not set for {config['shared_key']}; cannot create")
         return
+    # 중복 CREATE 방지: 공유 DB에 같은 _sync_id가 이미 있으면 skip
+    normalized_id = normalize_page_id(page_id)
+    try:
+        from notion_sync.notion_helpers import query_database
+        existing = query_database(shared_db_id,
+            filter={"property": "_sync_id", "rich_text": {"equals": normalized_id}})
+        if existing.get("results"):
+            logger.info(f"Skipping duplicate create: {config['shared_key']} _sync_id={normalized_id}")
+            return
+    except Exception:
+        pass
     # Apply on_create hook (e.g., set date=now)
     on_create = config.get("on_create")
     if on_create:

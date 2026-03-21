@@ -23,7 +23,8 @@ def init_notion(token: str):
     notion = Client(auth=token)
 
 
-def query_database(db_id: str, filter: dict = None, sorts: list = None) -> dict:
+def query_database(db_id: str, filter: dict = None, sorts: list = None,
+                   start_cursor: str = None) -> dict:
     """Query a Notion data source via direct HTTP (API 2025-09-03)."""
     import httpx
     body = {}
@@ -31,6 +32,8 @@ def query_database(db_id: str, filter: dict = None, sorts: list = None) -> dict:
         body["filter"] = filter
     if sorts:
         body["sorts"] = sorts
+    if start_cursor:
+        body["start_cursor"] = start_cursor
     resp = httpx.post(
         f"https://api.notion.com/v1/data_sources/{db_id}/query",
         headers={
@@ -42,6 +45,19 @@ def query_database(db_id: str, filter: dict = None, sorts: list = None) -> dict:
     )
     resp.raise_for_status()
     return resp.json()
+
+
+def query_database_all(db_id: str, filter: dict = None, sorts: list = None) -> list:
+    """Query all pages from a data source, handling pagination."""
+    all_results = []
+    cursor = None
+    while True:
+        resp = query_database(db_id, filter=filter, sorts=sorts, start_cursor=cursor)
+        all_results.extend(resp.get("results", []))
+        if not resp.get("has_more"):
+            break
+        cursor = resp.get("next_cursor")
+    return all_results
 
 
 def api_call(fn, *args, max_retries=5, **kwargs):
