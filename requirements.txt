@@ -9,4 +9,3 @@ packaging>=25.0
 gunicorn>=23.0.0
 notion-client>=2.0.0
 httpx
-azure-storage-queue
