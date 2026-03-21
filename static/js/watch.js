@@ -5,53 +5,57 @@
     var progressText = document.getElementById("progressText");
     var completeBtn = document.getElementById("completeBtn");
 
+    // 비디오 소스 비동기 로딩 — 페이지 렌더 후 영상 로드
+    if (config.streamUrl) {
+        video.src = config.streamUrl;
+        video.preload = "metadata";
+    }
+
+    if (config.previewMode) {
+        if (completeBtn) completeBtn.style.display = 'none';
+        return;
+    }
+
     var intervalId = null;
     var completed = config.isCompleted;
     var currentProgress = config.progress;
+    var sessionStartTime = new Date().toISOString();
 
-    // 물리적 시청 시간 추적
+    // 물리적 시청 시간 추적 (이전 누적값부터 시작)
     var accumulatedSeconds = config.watchedSeconds;
     var playStartTime = null;
 
-    // 초기 버튼 상태
     updateButtonState();
 
-    // 이어보기: 이전 재생 위치 복원
     video.addEventListener("loadedmetadata", function () {
         if (config.currentPosition > 0) {
             video.currentTime = config.currentPosition;
         }
     });
 
-    // 재생 시작/재개
     video.addEventListener("play", function () {
         playStartTime = Date.now();
         startInterval();
     });
 
-    // 일시정지
     video.addEventListener("pause", function () {
         flushPlayTime();
         stopInterval();
     });
 
-    // 영상 종료
     video.addEventListener("ended", function () {
         flushPlayTime();
         stopInterval();
     });
 
-    // 재생 위치 변화 시 진도율 실시간 반영
     video.addEventListener("timeupdate", function () {
         if (video.duration > 0) {
-            var localProgress = Math.min(100, Math.max(0, (video.currentTime / video.duration) * 100));
-            currentProgress = localProgress;
+            currentProgress = Math.min(100, (video.currentTime / video.duration) * 100);
             updateProgressUI(currentProgress);
             updateButtonState();
         }
     });
 
-    // 현재 재생 세션의 물리 시간을 누적
     function flushPlayTime() {
         if (playStartTime) {
             accumulatedSeconds += (Date.now() - playStartTime) / 1000;
@@ -59,39 +63,54 @@
         }
     }
 
-    // 현재까지 총 물리 시청 시간 (초)
     function getTotalWatched() {
         var total = accumulatedSeconds;
-        if (playStartTime) {
-            total += (Date.now() - playStartTime) / 1000;
-        }
+        if (playStartTime) total += (Date.now() - playStartTime) / 1000;
         return total;
     }
 
-    // 30초 간격 진행률 전송
+    function getSessionWatched() {
+        return getTotalWatched() - config.watchedSeconds;
+    }
+
+    // --- 공통 데이터 빌더 ---
+
+    function buildProgressData() {
+        return {
+            page_id: config.pageId,
+            current_position: video.currentTime,
+            duration: video.duration,
+            watched_seconds: getTotalWatched(),
+        };
+    }
+
+    function buildSessionData() {
+        return {
+            page_id: config.pageId,
+            current_position: video.currentTime,
+            duration: video.duration,
+            watched_seconds: getTotalWatched(),
+            session_watched_seconds: getSessionWatched(),
+            session_start: sessionStartTime,
+        };
+    }
+
+    // --- 전송 ---
+
     function startInterval() {
         stopInterval();
         intervalId = setInterval(sendProgress, 30000);
     }
 
     function stopInterval() {
-        if (intervalId) {
-            clearInterval(intervalId);
-            intervalId = null;
-        }
+        if (intervalId) { clearInterval(intervalId); intervalId = null; }
     }
 
     function sendProgress() {
-        var data = {
-            page_id: config.pageId,
-            current_position: video.currentTime,
-            duration: video.duration,
-            watched_seconds: getTotalWatched(),
-        };
         fetch("/api/webhook/tracking/progress", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
+            body: JSON.stringify(buildProgressData()),
         })
             .then(function (r) { return r.json(); })
             .then(function (res) {
@@ -110,16 +129,10 @@
         completeBtn.disabled = true;
         completeBtn.textContent = "완료됨";
 
-        var data = {
-            page_id: config.pageId,
-            current_position: video.currentTime,
-            duration: video.duration,
-            watched_seconds: getTotalWatched(),
-        };
         fetch("/api/webhook/tracking/complete", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
+            body: JSON.stringify(buildProgressData()),
         })
             .then(function (r) { return r.json(); })
             .then(function (res) {
@@ -129,7 +142,15 @@
                 }
             })
             .catch(function () {});
+
+        fetch("/api/webhook/tracking/session-end", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(buildSessionData()),
+        }).catch(function () {});
     }
+
+    // --- UI ---
 
     function updateProgressUI(progress) {
         var p = Math.min(100, Math.max(0, progress));
@@ -148,7 +169,6 @@
         }
     }
 
-    // 수강 완료 버튼 — 95% 이상일 때만, confirm 후 처리
     completeBtn.addEventListener("click", function () {
         if (completed || currentProgress < 95) return;
         if (confirm("수강을 완료하시겠습니까?")) {
@@ -156,19 +176,17 @@
         }
     });
 
-    // 페이지 이탈 시 sendBeacon
-    function sendBeaconProgress() {
-        if (!video.duration) return;
+    // --- 페이지 이탈 ---
+
+    var exitSent = false;
+    function sendBeaconOnExit() {
+        if (exitSent || !video.duration) return;
+        exitSent = true;
         flushPlayTime();
-        var data = JSON.stringify({
-            page_id: config.pageId,
-            current_position: video.currentTime,
-            duration: video.duration,
-            watched_seconds: getTotalWatched(),
-        });
-        navigator.sendBeacon("/api/webhook/tracking/progress", data);
+        navigator.sendBeacon("/api/webhook/tracking/complete", JSON.stringify(buildProgressData()));
+        navigator.sendBeacon("/api/webhook/tracking/session-end", JSON.stringify(buildSessionData()));
     }
 
-    window.addEventListener("pagehide", sendBeaconProgress);
-    window.addEventListener("beforeunload", sendBeaconProgress);
+    window.addEventListener("pagehide", sendBeaconOnExit);
+    window.addEventListener("beforeunload", sendBeaconOnExit);
 })();
