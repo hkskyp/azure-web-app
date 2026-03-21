@@ -29,7 +29,7 @@ def _find_subject_by_name(subject_name: str, shared_db_ids: dict) -> str | None:
     if not subject_db_id or not subject_name:
         return None
     try:
-        from notion_helpers import query_database
+        from notion_sync.notion_helpers import query_database
         resp = query_database(subject_db_id, filter={
             "property": "과목명", "title": {"equals": subject_name.strip()}
         })

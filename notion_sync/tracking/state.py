@@ -139,7 +139,7 @@ def create_watch_history_snapshot(page_id: str, watched_seconds: float,
     """
     try:
         from notion_sync.routes import SHARED_DB_IDS
-        from notion_helpers import normalize_page_id
+        from notion_sync.notion_helpers import normalize_page_id
         watch_history_db = SHARED_DB_IDS.get("watch_history", "")
         if not watch_history_db:
             logger.warning("watch_history DB not configured, skipping")
