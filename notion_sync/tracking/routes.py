@@ -27,7 +27,7 @@ from notion_sync.tracking.state import (
 from notion_sync.tracking.video_parser import convert_dropbox_url, convert_dropbox_stream_url, probe_video_duration
 
 router = APIRouter()
-templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "..", "templates"))
+templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "..", "..", "templates"))
 
 PAGE_ID_PATTERN = re.compile(r'^[a-f0-9\-]{32,36}$')
 _progress_timestamps: dict[str, float] = {}
